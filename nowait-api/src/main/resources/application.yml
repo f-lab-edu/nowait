@@ -1,1 +1,3 @@
-spring.application.name=nowait
+spring:
+  profiles:
+    active: local
