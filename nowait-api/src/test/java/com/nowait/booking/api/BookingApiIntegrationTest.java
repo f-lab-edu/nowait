@@ -202,6 +202,4 @@ class BookingApiIntegrationTest {
             .partySize(partySize)
             .build();
     }
-
-
 }
