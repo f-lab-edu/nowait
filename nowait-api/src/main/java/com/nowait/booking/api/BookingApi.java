@@ -3,6 +3,7 @@ package com.nowait.booking.api;
 import static org.springframework.http.ResponseEntity.created;
 import static org.springframework.http.ResponseEntity.ok;
 
+import com.nowait.booking.dto.TimeSlotDto;
 import com.nowait.booking.dto.request.BookingReq;
 import com.nowait.booking.dto.response.BookingRes;
 import com.nowait.booking.dto.response.DailyBookingStatusRes;
@@ -11,6 +12,8 @@ import com.nowait.booking.dto.response.GetDepositInfoRes;
 import com.nowait.common.api.dto.ApiResult;
 import jakarta.validation.Valid;
 import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -40,7 +43,13 @@ public class BookingApi {
         @RequestParam(required = false) LocalDate date
     ) {
         // TODO: 예약 현황 조회 비즈니스 로직 호출
-        ApiResult<DailyBookingStatusRes> result = ApiResult.ok(null);
+        ApiResult<DailyBookingStatusRes> result = ApiResult.ok(
+            DailyBookingStatusRes.builder()
+                .placeId(placeId)
+                .date(date)
+                .timeList(List.of(new TimeSlotDto(LocalTime.of(18, 0), true)))
+                .build()
+        );
 
         return ok(result);
     }
