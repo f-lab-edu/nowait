@@ -172,6 +172,27 @@ class BookingApiIntegrationTest {
             .andExpect(jsonPath("$.data").doesNotExist());
     }
 
+    @DisplayName("예약자는 방문 예정인 예약을 취소할 수 있다.")
+    @Test
+    void cancelBooking() throws Exception {
+        // given
+        long bookingId = 1L;
+
+        // when
+        ResultActions result = mockMvc.perform(
+            post("/api/bookings/{bookingId}/cancel", bookingId)
+                .header("Authorization", "Bearer " + "access-token")
+                .contentType(MediaType.APPLICATION_JSON)
+        );
+
+        // then
+        result.andExpect(status().isOk())
+            .andExpect(jsonPath("$.code").value("200"))
+            .andExpect(jsonPath("$.status").value("OK"))
+            .andExpect(jsonPath("$.message").value("OK"))
+            .andExpect(jsonPath("$.data").doesNotExist());
+    }
+
     private static BookingReq createBookRequest(long placeId, LocalDate date, LocalTime time,
         int partySize) {
         return BookingReq.builder()
