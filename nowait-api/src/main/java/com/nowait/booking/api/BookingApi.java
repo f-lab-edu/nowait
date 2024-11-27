@@ -13,6 +13,7 @@ import com.nowait.common.api.dto.ApiResult;
 import jakarta.validation.Valid;
 import java.net.URI;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -123,7 +124,32 @@ public class BookingApi {
         @PathVariable Long bookingId
     ) {
         // TODO: 예약 정보 조회 비즈니스 로직 호출
-        ApiResult<GetBookingInfoRes> result = ApiResult.ok(null);
+        ApiResult<GetBookingInfoRes> result = ApiResult.ok(
+            GetBookingInfoRes.builder()
+                .bookingId(bookingId)
+                .date(LocalDate.of(2024, 12, 25))
+                .time(LocalTime.of(18, 0))
+                .partySize(2)
+                .bookingStatus("CONFIRMED")
+                .bookedAt(LocalDateTime.of(2024, 11, 25, 17, 10, 0))
+                .placeId(1L)
+                .placeName("모수")
+                .placeDescription("한남동 안성재 셰프의 감각적인 미슐랭 3스타 파인다이닝")
+                .placeType("RESTAURANT")
+                .placePhoneNumber("02-1234-5678")
+                .placeOldAddress("한남동 738-11")
+                .placeRoadAddress("서울 용산구 이태원로55가길 45")
+                .depositRequired(true)
+                .depositAmount(20_000)
+                .depositDescription("1인 예약금 x 2명")
+                .refundPolicy("- 1일 전 취소: 100% 환불\n- 당일 취소: 환불 불가\n- 노쇼 시: 환불 불가")
+                .paymentId(1L)
+                .paymentStatus("PAYMENT_COMPLETED")
+                .paymentMethod("KAKAO_PAY")
+                .paymentAmount(20_000)
+                .paidAt(LocalDateTime.of(2024, 11, 25, 17, 12, 0))
+                .build()
+        );
 
         return ok(result);
     }

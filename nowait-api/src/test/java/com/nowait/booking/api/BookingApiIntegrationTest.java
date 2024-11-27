@@ -108,6 +108,49 @@ class BookingApiIntegrationTest {
                 "- 1일 전 취소: 100% 환불\n- 당일 취소: 환불 불가\n- 노쇼 시: 환불 불가"));
     }
 
+    @DisplayName("예약자는 예약 정보를 확인할 수 있다.")
+    @Test
+    void getBookingInfo() throws Exception {
+        // given
+        long bookingId = 1L;
+
+        // when
+        ResultActions result = mockMvc.perform(
+            get("/api/bookings/{bookingId}", bookingId)
+                .header("Authorization", "Bearer " + "access-token")
+                .contentType(MediaType.APPLICATION_JSON)
+        );
+
+        // then
+        result.andExpect(status().isOk())
+            .andExpect(jsonPath("$.code").value("200"))
+            .andExpect(jsonPath("$.status").value("OK"))
+            .andExpect(jsonPath("$.message").value("OK"))
+            .andExpect(jsonPath("$.data.bookingId").value("1"))
+            .andExpect(jsonPath("$.data.date").value("2024-12-25"))
+            .andExpect(jsonPath("$.data.time").value("18:00"))
+            .andExpect(jsonPath("$.data.partySize").value(2))
+            .andExpect(jsonPath("$.data.bookingStatus").value("CONFIRMED"))
+            .andExpect(jsonPath("$.data.bookedAt").value("2024-11-25 17:10:00"))
+            .andExpect(jsonPath("$.data.placeId").value("1"))
+            .andExpect(jsonPath("$.data.placeName").value("모수"))
+            .andExpect(jsonPath("$.data.placeDescription").value("한남동 안성재 셰프의 감각적인 미슐랭 3스타 파인다이닝"))
+            .andExpect(jsonPath("$.data.placeType").value("RESTAURANT"))
+            .andExpect(jsonPath("$.data.placePhoneNumber").value("02-1234-5678"))
+            .andExpect(jsonPath("$.data.placeOldAddress").value("한남동 738-11"))
+            .andExpect(jsonPath("$.data.placeRoadAddress").value("서울 용산구 이태원로55가길 45"))
+            .andExpect(jsonPath("$.data.depositRequired").value(true))
+            .andExpect(jsonPath("$.data.depositAmount").value(20_000))
+            .andExpect(jsonPath("$.data.depositDescription").value("1인 예약금 x 2명"))
+            .andExpect(jsonPath("$.data.refundPolicy").value(
+                "- 1일 전 취소: 100% 환불\n- 당일 취소: 환불 불가\n- 노쇼 시: 환불 불가"))
+            .andExpect(jsonPath("$.data.paymentId").value("1"))
+            .andExpect(jsonPath("$.data.paymentStatus").value("PAYMENT_COMPLETED"))
+            .andExpect(jsonPath("$.data.paymentMethod").value("KAKAO_PAY"))
+            .andExpect(jsonPath("$.data.paymentAmount").value(20_000))
+            .andExpect(jsonPath("$.data.paidAt").value("2024-11-25 17:12:00"));
+    }
+
     private static BookingReq createBookRequest(long placeId, LocalDate date, LocalTime time,
         int partySize) {
         return BookingReq.builder()
