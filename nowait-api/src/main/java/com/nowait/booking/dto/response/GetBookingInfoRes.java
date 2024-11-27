@@ -13,8 +13,8 @@ public record GetBookingInfoRes(
 
     // 가게 관련 정보
     Long placeId,
-    Long placeName,
-    Long placeDescription,
+    String placeName,
+    String placeDescription,
     String placeType,
     String placePhoneNumber,
     String placeOldAddress,
@@ -30,7 +30,7 @@ public record GetBookingInfoRes(
     Long paymentId,
     String paymentStatus,
     String paymentMethod,
-    String paymentAmount
+    Integer paymentAmount,
 ) {
 
 }
