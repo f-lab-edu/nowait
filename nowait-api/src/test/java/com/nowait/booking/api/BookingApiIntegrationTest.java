@@ -81,6 +81,33 @@ class BookingApiIntegrationTest {
             .andExpect(jsonPath("$.data.confirmRequired").value(true));
     }
 
+    @DisplayName("예약자는 예약금 정보를 확인할 수 있다.")
+    @Test
+    void getDepositInfo() throws Exception {
+        // given
+        long bookingId = 1L;
+
+        // when
+        ResultActions result = mockMvc.perform(
+            get("/api/bookings/{bookingId}/deposit-info", bookingId)
+                .header("Authorization", "Bearer " + "access-token")
+                .contentType(MediaType.APPLICATION_JSON)
+        );
+
+        // then
+        result.andExpect(status().isOk())
+            .andExpect(jsonPath("$.code").value("200"))
+            .andExpect(jsonPath("$.status").value("OK"))
+            .andExpect(jsonPath("$.message").value("OK"))
+            .andExpect(jsonPath("$.data.bookingId").value("1"))
+            .andExpect(jsonPath("$.data.placeId").value("1"))
+            .andExpect(jsonPath("$.data.required").value(true))
+            .andExpect(jsonPath("$.data.amount").value(20_000))
+            .andExpect(jsonPath("$.data.description").value("1인 예약금 x 2명"))
+            .andExpect(jsonPath("$.data.refundPolicy").value(
+                "- 1일 전 취소: 100% 환불\n- 당일 취소: 환불 불가\n- 노쇼 시: 환불 불가"));
+    }
+
     private static BookingReq createBookRequest(long placeId, LocalDate date, LocalTime time,
         int partySize) {
         return BookingReq.builder()

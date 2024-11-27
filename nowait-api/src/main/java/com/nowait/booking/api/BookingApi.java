@@ -98,7 +98,16 @@ public class BookingApi {
         @PathVariable Long bookingId
     ) {
         // TODO: 예약금 정보 조회 비즈니스 로직 호출
-        ApiResult<GetDepositInfoRes> result = ApiResult.ok(null);
+        ApiResult<GetDepositInfoRes> result = ApiResult.ok(
+            GetDepositInfoRes.builder()
+                .bookingId(bookingId)
+                .placeId(1L)
+                .required(true)
+                .amount(20_000)
+                .description("1인 예약금 x 2명")
+                .refundPolicy("- 1일 전 취소: 100% 환불\n- 당일 취소: 환불 불가\n- 노쇼 시: 환불 불가")
+                .build()
+        );
 
         return ok(result);
     }
