@@ -151,6 +151,27 @@ class BookingApiIntegrationTest {
             .andExpect(jsonPath("$.data.paidAt").value("2024-11-25 17:12:00"));
     }
 
+    @DisplayName("가게 관리자는 확정 대기 중인 예약을 확정할 수 있다.")
+    @Test
+    void confirmBooking() throws Exception {
+        // given
+        long bookingId = 1L;
+
+        // when
+        ResultActions result = mockMvc.perform(
+            post("/api/bookings/{bookingId}/confirm", bookingId)
+                .header("Authorization", "Bearer " + "access-token")
+                .contentType(MediaType.APPLICATION_JSON)
+        );
+
+        // then
+        result.andExpect(status().isOk())
+            .andExpect(jsonPath("$.code").value("200"))
+            .andExpect(jsonPath("$.status").value("OK"))
+            .andExpect(jsonPath("$.message").value("OK"))
+            .andExpect(jsonPath("$.data").doesNotExist());
+    }
+
     private static BookingReq createBookRequest(long placeId, LocalDate date, LocalTime time,
         int partySize) {
         return BookingReq.builder()
