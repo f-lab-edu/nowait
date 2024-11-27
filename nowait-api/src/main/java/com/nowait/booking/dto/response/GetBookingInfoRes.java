@@ -7,9 +7,12 @@ public record GetBookingInfoRes(
     // 예약 관련 정보
     Long bookingId,
     LocalDate date,
+    @JsonFormat(shape = STRING, pattern = "HH:mm")
     LocalTime time,
     Integer partySize,
     String bookingStatus,
+    @JsonFormat(shape = STRING, pattern = "yyyy-MM-dd HH:mm:ss")
+    LocalDateTime bookedAt,
 
     // 가게 관련 정보
     Long placeId,
@@ -31,6 +34,8 @@ public record GetBookingInfoRes(
     String paymentStatus,
     String paymentMethod,
     Integer paymentAmount,
+    @JsonFormat(shape = STRING, pattern = "yyyy-MM-dd HH:mm:ss")
+    LocalDateTime paidAt
 ) {
 
 }
