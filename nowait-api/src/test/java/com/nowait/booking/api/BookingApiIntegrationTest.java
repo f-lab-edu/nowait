@@ -1,11 +1,14 @@
 package com.nowait.booking.api;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.nowait.booking.dto.request.BookingReq;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,4 +54,42 @@ class BookingApiIntegrationTest {
             .andExpect(jsonPath("$.data.timeList[0].time").value("18:00"))
             .andExpect(jsonPath("$.data.timeList[0].available").value(true));
     }
+
+    @DisplayName("사용자는 특정 날짜와 시간에 테이블을 예약할 수 있다")
+    @Test
+    void book() throws Exception {
+        // given
+        BookingReq request = createBookRequest(1L, LocalDate.of(2024, 12, 25),
+            LocalTime.of(18, 0), 2);
+
+        // when
+        ResultActions result = mockMvc.perform(
+            post("/api/bookings")
+                .header("Authorization", "Bearer " + "access-token")
+                .content(objectMapper.writeValueAsString(request))
+                .contentType(MediaType.APPLICATION_JSON)
+        );
+
+        // then
+        result.andExpect(status().isCreated())
+            .andExpect(jsonPath("$.code").value("201"))
+            .andExpect(jsonPath("$.status").value("CREATED"))
+            .andExpect(jsonPath("$.message").value("CREATED"))
+            .andExpect(jsonPath("$.data.bookingId").value("1"))
+            .andExpect(jsonPath("$.data.bookingStatus").value("PENDING_PAYMENT"))
+            .andExpect(jsonPath("$.data.depositRequired").value(true))
+            .andExpect(jsonPath("$.data.confirmRequired").value(true));
+    }
+
+    private static BookingReq createBookRequest(long placeId, LocalDate date, LocalTime time,
+        int partySize) {
+        return BookingReq.builder()
+            .placeId(placeId)
+            .date(date)
+            .time(time)
+            .partySize(partySize)
+            .build();
+    }
+
+
 }

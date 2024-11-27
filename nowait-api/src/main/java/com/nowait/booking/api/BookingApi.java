@@ -11,6 +11,7 @@ import com.nowait.booking.dto.response.GetBookingInfoRes;
 import com.nowait.booking.dto.response.GetDepositInfoRes;
 import com.nowait.common.api.dto.ApiResult;
 import jakarta.validation.Valid;
+import java.net.URI;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
@@ -24,6 +25,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 @RestController
 @RequestMapping("/api/bookings")
@@ -65,9 +67,23 @@ public class BookingApi {
         @RequestBody @Valid BookingReq request
     ) {
         // TODO: 테이블 예약 비즈니스 로직 호출
-        ApiResult<BookingRes> result = ApiResult.of(HttpStatus.CREATED, null);
+        ApiResult<BookingRes> result = ApiResult.of(
+            HttpStatus.CREATED,
+            BookingRes.builder()
+                .bookingId(1L)
+                .bookingStatus("PENDING_PAYMENT")
+                .confirmRequired(true)
+                .depositRequired(true)
+                .build()
+        );
 
-        return created(null)
+        URI location = ServletUriComponentsBuilder
+            .fromCurrentRequest()
+            .path("/1")
+            .build()
+            .toUri();
+
+        return created(location)
             .body(result);
     }
 
