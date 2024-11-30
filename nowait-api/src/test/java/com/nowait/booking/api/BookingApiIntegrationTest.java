@@ -10,6 +10,7 @@ import com.nowait.booking.dto.response.GetDepositInfoRes;
 import com.nowait.common.api.dto.ApiResult;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +23,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.util.UriComponentsBuilder;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @AutoConfigureMockMvc
@@ -29,6 +31,13 @@ class BookingApiIntegrationTest {
 
     @Autowired
     private TestRestTemplate template;
+    private String authorization;
+
+    @BeforeEach
+    void setUp() {
+        String accessToken = "access-token";
+        authorization = "Bearer " + accessToken;
+    }
 
     @DisplayName("사용자는 특정 날짜에 가게의 예약 가능 시간을 확인할 수 있다")
     @Test
@@ -37,14 +46,18 @@ class BookingApiIntegrationTest {
         long placeId = 1L;
         LocalDate date = LocalDate.of(2024, 12, 25);
 
+        String url = UriComponentsBuilder.fromPath("/api/bookings")
+            .queryParam("placeId", placeId)
+            .queryParam("date", date)
+            .toUriString();
+
         // when
         ResponseEntity<ApiResult<DailyBookingStatusRes>> result = template.exchange(
-            "/api/bookings?placeId={placeId}&date={date}",
+            url,
             HttpMethod.GET,
             null,
             new ParameterizedTypeReference<>() {
-            },
-            placeId, date
+            }
         );
 
         // then
@@ -71,16 +84,17 @@ class BookingApiIntegrationTest {
         BookingReq request = new BookingReq(1L, LocalDate.of(2024, 12, 25),
             LocalTime.of(18, 0), 2);
 
-        RequestEntity<BookingReq> reqBodyWithHeader = RequestEntity
-            .post("/api/bookings")
-            .header("Authorization", "Bearer " + "access-token")
+        String url = "/api/bookings";
+        RequestEntity<BookingReq> headerAndBody = RequestEntity
+            .post(url)
+            .header("Authorization", authorization)
             .body(request);
 
         // when
         ResponseEntity<ApiResult<BookingRes>> response = template.exchange(
-            "/api/bookings",
+            url,
             HttpMethod.POST,
-            reqBodyWithHeader,
+            headerAndBody,
             new ParameterizedTypeReference<>() {
             }
         );
@@ -106,19 +120,23 @@ class BookingApiIntegrationTest {
     void getDepositInfo() {
         // given
         long bookingId = 1L;
+
+        String url = UriComponentsBuilder.fromPath("/api/bookings/{bookingId}/deposit-info")
+            .buildAndExpand(bookingId)
+            .toUriString();
+
         RequestEntity<Void> header = RequestEntity
-            .get("/api/bookings/{bookingId}/deposit-info", bookingId)
-            .header("Authorization", "Bearer " + "access-token")
+            .get(url)
+            .header("Authorization", authorization)
             .build();
 
         // when
         ResponseEntity<ApiResult<GetDepositInfoRes>> response = template.exchange(
-            "/api/bookings/{bookingId}/deposit-info",
+            url,
             HttpMethod.GET,
             header,
             new ParameterizedTypeReference<>() {
-            },
-            bookingId
+            }
         );
 
         // then
@@ -145,19 +163,23 @@ class BookingApiIntegrationTest {
     void getBookingInfo() {
         // given
         long bookingId = 1L;
+
+        String url = UriComponentsBuilder.fromPath("/api/bookings/{bookingId}")
+            .buildAndExpand(bookingId)
+            .toUriString();
+
         RequestEntity<Void> header = RequestEntity
-            .get("/api/bookings/{bookingId}", bookingId)
-            .header("Authorization", "Bearer " + "access-token")
+            .get(url)
+            .header("Authorization", authorization)
             .build();
 
         // when
         ResponseEntity<ApiResult<GetBookingInfoRes>> response = template.exchange(
-            "/api/bookings/{bookingId}",
+            url,
             HttpMethod.GET,
             header,
             new ParameterizedTypeReference<>() {
-            },
-            bookingId
+            }
         );
 
         // then
@@ -196,20 +218,24 @@ class BookingApiIntegrationTest {
     void confirmBooking() {
         // given
         long bookingId = 1L;
+
+        String url = UriComponentsBuilder.fromPath("/api/bookings/{bookingId}/confirm")
+            .buildAndExpand(bookingId)
+            .toUriString();
+
         RequestEntity<Void> header = RequestEntity
-            .post("/api/bookings/{bookingId}/confirm", bookingId)
-            .header("Authorization", "Bearer " + "access-token")
+            .post(url)
+            .header("Authorization", authorization)
             .build();
 
         // when
 
         ResponseEntity<ApiResult<Void>> response = template.exchange(
-            "/api/bookings/{bookingId}/confirm",
+            url,
             HttpMethod.POST,
             header,
             new ParameterizedTypeReference<>() {
-            },
-            bookingId
+            }
         );
 
         // then
@@ -227,19 +253,23 @@ class BookingApiIntegrationTest {
     void cancelBooking() {
         // given
         long bookingId = 1L;
+
+        String url = UriComponentsBuilder.fromPath("/api/bookings/{bookingId}/cancel")
+            .buildAndExpand(bookingId)
+            .toUriString();
+
         RequestEntity<Void> header = RequestEntity
-            .post("/api/bookings/{bookingId}/cancel", bookingId)
-            .header("Authorization", "Bearer " + "access-token")
+            .post(url)
+            .header("Authorization", authorization)
             .build();
 
         // when
         ResponseEntity<ApiResult<Void>> response = template.exchange(
-            "/api/bookings/{bookingId}/cancel",
+            url,
             HttpMethod.POST,
             header,
             new ParameterizedTypeReference<>() {
-            },
-            bookingId
+            }
         );
 
         // then
