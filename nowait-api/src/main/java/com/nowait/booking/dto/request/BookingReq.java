@@ -3,7 +3,6 @@ package com.nowait.booking.dto.request;
 import jakarta.validation.constraints.NotNull;
 import java.time.LocalDate;
 import java.time.LocalTime;
-import lombok.Builder;
 
 /**
  * @param placeId   가게 식별자
@@ -11,7 +10,6 @@ import lombok.Builder;
  * @param time      예약 시간
  * @param partySize 예약 인원 (default: 1)
  */
-@Builder
 public record BookingReq(
     @NotNull
     Long placeId,

@@ -59,7 +59,7 @@ class BookingApiIntegrationTest {
     @Test
     void book() throws Exception {
         // given
-        BookingReq request = createBookRequest(1L, LocalDate.of(2024, 12, 25),
+        BookingReq request = new BookingReq(1L, LocalDate.of(2024, 12, 25),
             LocalTime.of(18, 0), 2);
 
         // when
@@ -191,15 +191,5 @@ class BookingApiIntegrationTest {
             .andExpect(jsonPath("$.status").value("OK"))
             .andExpect(jsonPath("$.message").value("OK"))
             .andExpect(jsonPath("$.data").doesNotExist());
-    }
-
-    private static BookingReq createBookRequest(long placeId, LocalDate date, LocalTime time,
-        int partySize) {
-        return BookingReq.builder()
-            .placeId(placeId)
-            .date(date)
-            .time(time)
-            .partySize(partySize)
-            .build();
     }
 }

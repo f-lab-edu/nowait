@@ -43,11 +43,8 @@ public class BookingApi {
         // TODO: 예약 현황 조회 비즈니스 로직 호출
 
         return ApiResult.ok(
-            DailyBookingStatusRes.builder()
-                .placeId(placeId)
-                .date(date)
-                .timeList(List.of(new TimeSlotDto(LocalTime.of(18, 0), true)))
-                .build()
+            new DailyBookingStatusRes(placeId, date,
+                List.of(new TimeSlotDto(LocalTime.of(18, 0), true)))
         );
     }
 
@@ -66,12 +63,7 @@ public class BookingApi {
 
         return ApiResult.of(
             HttpStatus.CREATED,
-            BookingRes.builder()
-                .bookingId(1L)
-                .bookingStatus("PENDING_PAYMENT")
-                .confirmRequired(true)
-                .depositRequired(true)
-                .build()
+            new BookingRes(1L, "PENDING_PAYMENT", true, true)
         );
     }
 
@@ -88,14 +80,9 @@ public class BookingApi {
         // TODO: 예약금 정보 조회 비즈니스 로직 호출
 
         return ApiResult.ok(
-            GetDepositInfoRes.builder()
-                .bookingId(bookingId)
-                .placeId(1L)
-                .required(true)
-                .amount(20_000)
-                .description("1인 예약금 x 2명")
-                .refundPolicy("- 1일 전 취소: 100% 환불\n- 당일 취소: 환불 불가\n- 노쇼 시: 환불 불가")
-                .build()
+            new GetDepositInfoRes(bookingId, 1L, true, 20_000, "1인 예약금 x 2명",
+                "- 1일 전 취소: 100% 환불\n- 당일 취소: 환불 불가\n- 노쇼 시: 환불 불가"
+            )
         );
     }
 
@@ -112,30 +99,28 @@ public class BookingApi {
         // TODO: 예약 정보 조회 비즈니스 로직 호출
 
         return ApiResult.ok(
-            GetBookingInfoRes.builder()
-                .bookingId(bookingId)
-                .date(LocalDate.of(2024, 12, 25))
-                .time(LocalTime.of(18, 0))
-                .partySize(2)
-                .bookingStatus("CONFIRMED")
-                .bookedAt(LocalDateTime.of(2024, 11, 25, 17, 10, 0))
-                .placeId(1L)
-                .placeName("모수")
-                .placeDescription("한남동 안성재 셰프의 감각적인 미슐랭 3스타 파인다이닝")
-                .placeType("RESTAURANT")
-                .placePhoneNumber("02-1234-5678")
-                .placeOldAddress("한남동 738-11")
-                .placeRoadAddress("서울 용산구 이태원로55가길 45")
-                .depositRequired(true)
-                .depositAmount(20_000)
-                .depositDescription("1인 예약금 x 2명")
-                .refundPolicy("- 1일 전 취소: 100% 환불\n- 당일 취소: 환불 불가\n- 노쇼 시: 환불 불가")
-                .paymentId(1L)
-                .paymentStatus("PAYMENT_COMPLETED")
-                .paymentMethod("KAKAO_PAY")
-                .paymentAmount(20_000)
-                .paidAt(LocalDateTime.of(2024, 11, 25, 17, 12, 0))
-                .build()
+            new GetBookingInfoRes(
+                bookingId,
+                LocalDate.of(2024, 12, 25),
+                LocalTime.of(18, 0),
+                2,
+                "CONFIRMED",
+                LocalDateTime.of(2024, 11, 25, 17, 10, 0),
+                1L, "모수", "한남동 안성재 셰프의 감각적인 미슐랭 3스타 파인다이닝",
+                "RESTAURANT",
+                "02-1234-5678",
+                "한남동 738-11",
+                "서울 용산구 이태원로55가길 45",
+                true,
+                20_000,
+                "1인 예약금 x 2명",
+                "- 1일 전 취소: 100% 환불\n- 당일 취소: 환불 불가\n- 노쇼 시: 환불 불가",
+                1L,
+                "PAYMENT_COMPLETED",
+                "KAKAO_PAY",
+                20_000,
+                LocalDateTime.of(2024, 11, 25, 17, 12, 0)
+            )
         );
     }
 

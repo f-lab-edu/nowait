@@ -6,9 +6,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import lombok.Builder;
 
-@Builder
 public record GetBookingInfoRes(
     // 예약 관련 정보
     Long bookingId,
