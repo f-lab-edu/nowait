@@ -1,8 +1,5 @@
 package com.nowait.booking.api;
 
-import static org.springframework.http.ResponseEntity.created;
-import static org.springframework.http.ResponseEntity.ok;
-
 import com.nowait.booking.dto.TimeSlotDto;
 import com.nowait.booking.dto.request.BookingReq;
 import com.nowait.booking.dto.response.BookingRes;
@@ -11,22 +8,20 @@ import com.nowait.booking.dto.response.GetBookingInfoRes;
 import com.nowait.booking.dto.response.GetDepositInfoRes;
 import com.nowait.common.api.dto.ApiResult;
 import jakarta.validation.Valid;
-import java.net.URI;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 @RestController
 @RequestMapping("/api/bookings")
@@ -41,20 +36,19 @@ public class BookingApi {
      * @return 해당 날짜의 시간별 예약 현황
      */
     @GetMapping
-    public ResponseEntity<ApiResult<DailyBookingStatusRes>> getDailyBookingStatus(
+    public ApiResult<DailyBookingStatusRes> getDailyBookingStatus(
         @RequestParam Long placeId,
         @RequestParam(required = false) LocalDate date
     ) {
         // TODO: 예약 현황 조회 비즈니스 로직 호출
-        ApiResult<DailyBookingStatusRes> result = ApiResult.ok(
+
+        return ApiResult.ok(
             DailyBookingStatusRes.builder()
                 .placeId(placeId)
                 .date(date)
                 .timeList(List.of(new TimeSlotDto(LocalTime.of(18, 0), true)))
                 .build()
         );
-
-        return ok(result);
     }
 
     /**
@@ -64,11 +58,13 @@ public class BookingApi {
      * @return 예약 결과
      */
     @PostMapping
-    public ResponseEntity<ApiResult<BookingRes>> book(
+    @ResponseStatus(HttpStatus.CREATED)
+    public ApiResult<BookingRes> book(
         @RequestBody @Valid BookingReq request
     ) {
         // TODO: 테이블 예약 비즈니스 로직 호출
-        ApiResult<BookingRes> result = ApiResult.of(
+
+        return ApiResult.of(
             HttpStatus.CREATED,
             BookingRes.builder()
                 .bookingId(1L)
@@ -77,15 +73,6 @@ public class BookingApi {
                 .depositRequired(true)
                 .build()
         );
-
-        URI location = ServletUriComponentsBuilder
-            .fromCurrentRequest()
-            .path("/1")
-            .build()
-            .toUri();
-
-        return created(location)
-            .body(result);
     }
 
     /**
@@ -95,11 +82,12 @@ public class BookingApi {
      * @return 예약금 정보 조회 결과
      */
     @GetMapping("/{bookingId}/deposit-info")
-    public ResponseEntity<ApiResult<GetDepositInfoRes>> getDepositInfo(
+    public ApiResult<GetDepositInfoRes> getDepositInfo(
         @PathVariable Long bookingId
     ) {
         // TODO: 예약금 정보 조회 비즈니스 로직 호출
-        ApiResult<GetDepositInfoRes> result = ApiResult.ok(
+
+        return ApiResult.ok(
             GetDepositInfoRes.builder()
                 .bookingId(bookingId)
                 .placeId(1L)
@@ -109,8 +97,6 @@ public class BookingApi {
                 .refundPolicy("- 1일 전 취소: 100% 환불\n- 당일 취소: 환불 불가\n- 노쇼 시: 환불 불가")
                 .build()
         );
-
-        return ok(result);
     }
 
     /**
@@ -120,11 +106,12 @@ public class BookingApi {
      * @return 예약 정보 조회 결과
      */
     @GetMapping("/{bookingId}")
-    public ResponseEntity<ApiResult<GetBookingInfoRes>> getBookingInfo(
+    public ApiResult<GetBookingInfoRes> getBookingInfo(
         @PathVariable Long bookingId
     ) {
         // TODO: 예약 정보 조회 비즈니스 로직 호출
-        ApiResult<GetBookingInfoRes> result = ApiResult.ok(
+
+        return ApiResult.ok(
             GetBookingInfoRes.builder()
                 .bookingId(bookingId)
                 .date(LocalDate.of(2024, 12, 25))
@@ -150,8 +137,6 @@ public class BookingApi {
                 .paidAt(LocalDateTime.of(2024, 11, 25, 17, 12, 0))
                 .build()
         );
-
-        return ok(result);
     }
 
     /**
@@ -161,13 +146,12 @@ public class BookingApi {
      * @return 예약 확정 결과
      */
     @PostMapping("/{bookingId}/confirm")
-    public ResponseEntity<ApiResult<Void>> confirmBooking(
+    public ApiResult<Void> confirmBooking(
         @PathVariable Long bookingId
     ) {
         // TODO: 예약 확정 비즈니스 로직 호출
-        ApiResult<Void> result = ApiResult.ok(null);
 
-        return ok(result);
+        return ApiResult.ok(null);
     }
 
     /**
@@ -177,12 +161,11 @@ public class BookingApi {
      * @return 예약 취소 결과
      */
     @PostMapping("/{bookingId}/cancel")
-    public ResponseEntity<ApiResult<Void>> cancelBooking(
+    public ApiResult<Void> cancelBooking(
         @PathVariable Long bookingId
     ) {
         // TODO: 예약 취소 비즈니스 로직 호출
-        ApiResult<Void> result = ApiResult.ok(null);
 
-        return ok(result);
+        return ApiResult.ok(null);
     }
 }
