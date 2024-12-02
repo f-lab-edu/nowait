@@ -1,4 +1,4 @@
-package com.nowait.nowait;
+package com.nowait;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
