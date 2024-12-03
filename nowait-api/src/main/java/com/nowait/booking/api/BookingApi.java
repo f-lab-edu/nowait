@@ -1,6 +1,8 @@
 package com.nowait.booking.api;
 
-import com.nowait.booking.dto.TimeSlotDto;
+import static java.util.Objects.isNull;
+
+import com.nowait.booking.application.BookingService;
 import com.nowait.booking.dto.request.BookingReq;
 import com.nowait.booking.dto.response.BookingRes;
 import com.nowait.booking.dto.response.DailyBookingStatusRes;
@@ -11,7 +13,6 @@ import jakarta.validation.Valid;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -28,6 +29,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class BookingApi {
 
+    private final BookingService bookingService;
+
     /**
      * 가게 예약 현황 조회 API
      *
@@ -40,12 +43,8 @@ public class BookingApi {
         @RequestParam Long placeId,
         @RequestParam(required = false) LocalDate date
     ) {
-        // TODO: 예약 현황 조회 비즈니스 로직 호출
-
-        return ApiResult.ok(
-            new DailyBookingStatusRes(placeId, date,
-                List.of(new TimeSlotDto(LocalTime.of(18, 0), true)))
-        );
+        date = isNull(date) ? LocalDate.now() : date;
+        return ApiResult.ok(bookingService.getDailyBookingStatus(placeId, date));
     }
 
     /**
