@@ -17,7 +17,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @Table(name = "booking")
 @Getter
-@AllArgsConstructor
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Booking extends BaseTimeEntity {
 
@@ -26,7 +26,7 @@ public class Booking extends BaseTimeEntity {
     @Column(name = "id")
     private Long id;
 
-    @Column(name = "booking_slot_id", nullable = false)
+    @Column(name = "booking_slot_id", nullable = false, unique = true)
     private Long bookingSlotId;
 
     @Column(name = "user_id", nullable = false)
@@ -35,4 +35,17 @@ public class Booking extends BaseTimeEntity {
     @Enumerated(value = EnumType.STRING)
     @Column(name = "status", nullable = false, columnDefinition = "varchar(20)")
     private BookingStatus status;
+
+    @Column(name = "party_size")
+    private Integer partySize;
+
+    public static Booking of(Long userId, Integer partySize, BookingSlot slot) {
+        return new Booking(
+            null,
+            slot.getId(),
+            userId,
+            slot.book(),
+            partySize
+        );
+    }
 }
