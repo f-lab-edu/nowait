@@ -1,5 +1,6 @@
 package com.nowait.booking.api;
 
+import com.nowait.booking.application.BookingService;
 import com.nowait.booking.dto.TimeSlotDto;
 import com.nowait.booking.dto.request.BookingReq;
 import com.nowait.booking.dto.response.BookingRes;
@@ -27,6 +28,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/bookings")
 @RequiredArgsConstructor
 public class BookingApi {
+
+    private final BookingService bookingService;
 
     /**
      * 가게 예약 현황 조회 API

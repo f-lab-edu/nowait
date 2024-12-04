@@ -2,6 +2,7 @@ package com.nowait.booking.api;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.nowait.booking.domain.repository.BookingSlotRepository;
 import com.nowait.booking.dto.request.BookingReq;
 import com.nowait.booking.dto.response.BookingRes;
 import com.nowait.booking.dto.response.DailyBookingStatusRes;
@@ -12,9 +13,9 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.client.TestRestTemplate;
@@ -26,12 +27,15 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.util.UriComponentsBuilder;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
-@AutoConfigureMockMvc
 class BookingApiIntegrationTest {
 
     @Autowired
-    private TestRestTemplate template;
-    private String authorization;
+    TestRestTemplate template;
+
+    @Autowired
+    BookingSlotRepository bookingSlotRepository;
+
+    String authorization;
 
     @BeforeEach
     void setUp() {
@@ -39,42 +43,47 @@ class BookingApiIntegrationTest {
         authorization = "Bearer " + accessToken;
     }
 
-    @DisplayName("사용자는 특정 날짜에 가게의 예약 가능 시간을 확인할 수 있다")
-    @Test
-    void getDailyBookingStatus() {
-        // given
-        long placeId = 1L;
-        LocalDate date = LocalDate.of(2024, 12, 25);
+    @Nested
+    @DisplayName("예약 현황 조회 테스트")
+    class DailyBookingStatusTest {
 
-        String url = UriComponentsBuilder.fromPath("/api/bookings")
-            .queryParam("placeId", placeId)
-            .queryParam("date", date)
-            .toUriString();
+        @DisplayName("사용자는 특정 날짜에 가게의 예약 가능 시간을 확인할 수 있다")
+        @Test
+        void getDailyBookingStatus() {
+            // given
+            long placeId = 1L;
+            LocalDate date = LocalDate.of(2024, 12, 25);
 
-        // when
-        ResponseEntity<ApiResult<DailyBookingStatusRes>> result = template.exchange(
-            url,
-            HttpMethod.GET,
-            null,
-            new ParameterizedTypeReference<>() {
-            }
-        );
+            String url = UriComponentsBuilder.fromPath("/api/bookings")
+                .queryParam("placeId", placeId)
+                .queryParam("date", date)
+                .toUriString();
 
-        // then
-        assertThat(result.getStatusCode()).isEqualTo(HttpStatus.OK);
+            // when
+            ResponseEntity<ApiResult<DailyBookingStatusRes>> result = template.exchange(
+                url,
+                HttpMethod.GET,
+                null,
+                new ParameterizedTypeReference<>() {
+                }
+            );
 
-        ApiResult<DailyBookingStatusRes> body = result.getBody();
-        assertThat(body).isNotNull();
-        assertThat(body.code()).isEqualTo(200);
-        assertThat(body.status()).isEqualTo(HttpStatus.OK);
+            // then
+            assertThat(result.getStatusCode()).isEqualTo(HttpStatus.OK);
 
-        DailyBookingStatusRes data = body.data();
-        assertThat(data).isNotNull();
-        assertThat(data.placeId()).isEqualTo(placeId);
-        assertThat(data.date()).isEqualTo(date);
-        assertThat(data.timeList()).hasSize(1);
-        assertThat(data.timeList().get(0).time()).isEqualTo("18:00");
-        assertThat(data.timeList().get(0).available()).isTrue();
+            ApiResult<DailyBookingStatusRes> body = result.getBody();
+            assertThat(body).isNotNull();
+            assertThat(body.code()).isEqualTo(200);
+            assertThat(body.status()).isEqualTo(HttpStatus.OK);
+
+            DailyBookingStatusRes data = body.data();
+            assertThat(data).isNotNull();
+            assertThat(data.placeId()).isEqualTo(placeId);
+            assertThat(data.date()).isEqualTo(date);
+            assertThat(data.timeList()).hasSize(1);
+            assertThat(data.timeList().get(0).time()).isEqualTo("18:00");
+            assertThat(data.timeList().get(0).available()).isTrue();
+        }
     }
 
     @DisplayName("사용자는 특정 날짜와 시간에 테이블을 예약할 수 있다")
