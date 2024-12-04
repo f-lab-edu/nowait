@@ -2,7 +2,6 @@ package com.nowait.booking.api;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.nowait.booking.domain.model.BookingSlot;
 import com.nowait.booking.domain.repository.BookingSlotRepository;
 import com.nowait.booking.dto.request.BookingReq;
 import com.nowait.booking.dto.response.BookingRes;
@@ -55,9 +54,6 @@ class BookingApiIntegrationTest {
             long placeId = 1L;
             LocalDate date = LocalDate.of(2024, 12, 25);
 
-            BookingSlot bookingSlot = createBookingSlot(placeId, date, LocalTime.of(18, 0));
-            bookingSlotRepository.save(bookingSlot);
-
             String url = UriComponentsBuilder.fromPath("/api/bookings")
                 .queryParam("placeId", placeId)
                 .queryParam("date", date)
@@ -87,10 +83,6 @@ class BookingApiIntegrationTest {
             assertThat(data.timeList()).hasSize(1);
             assertThat(data.timeList().get(0).time()).isEqualTo("18:00");
             assertThat(data.timeList().get(0).available()).isTrue();
-        }
-
-        private static BookingSlot createBookingSlot(long placeId, LocalDate date, LocalTime time) {
-            return new BookingSlot(1L, placeId, 1L, date, time, false, true, true, 1L);
         }
     }
 
