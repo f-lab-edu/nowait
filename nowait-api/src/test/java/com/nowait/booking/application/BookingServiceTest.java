@@ -57,6 +57,13 @@ class BookingServiceTest {
         long placeId;
         LocalDate date;
 
+        @Mock
+        BookingSlot slotAt18;
+        @Mock
+        BookingSlot unavailableSlotAt18;
+        @Mock
+        BookingSlot unavailableSlotAt19;
+
         @BeforeEach
         void setUp() {
             placeId = 1L;
@@ -67,13 +74,16 @@ class BookingServiceTest {
         @Test
         void getDailyBookingStatus() {
             // given
-            List<BookingSlot> bookingSlots = List.of(
-                createBookingSlot(LocalTime.of(18, 0), false),
-                createBookingSlot(LocalTime.of(19, 0), true)
-            );
+            List<BookingSlot> bookingSlots = List.of(slotAt18, unavailableSlotAt19);
 
             when(bookingSlotRepository.findAllByPlaceIdAndDate(any(Long.class),
                 any(LocalDate.class))).thenReturn(bookingSlots);
+
+            when(slotAt18.getTime()).thenReturn(LocalTime.of(18, 0));
+            when(slotAt18.isBooked()).thenReturn(false);
+
+            when(unavailableSlotAt19.getTime()).thenReturn(LocalTime.of(19, 0));
+            when(unavailableSlotAt19.isBooked()).thenReturn(true);
 
             // when
             DailyBookingStatusRes response = bookingService.getDailyBookingStatus(placeId, date);
@@ -91,14 +101,19 @@ class BookingServiceTest {
         void getDailyBookingStatus2() {
             // given
             List<BookingSlot> bookingSlots = List.of(
-                createBookingSlot(LocalTime.of(18, 0), true),
-                createBookingSlot(LocalTime.of(18, 0), false),
-                createBookingSlot(LocalTime.of(19, 0), true),
-                createBookingSlot(LocalTime.of(19, 0), true)
-            );
+                unavailableSlotAt18, slotAt18, unavailableSlotAt19, unavailableSlotAt19);
 
             when(bookingSlotRepository.findAllByPlaceIdAndDate(any(Long.class),
                 any(LocalDate.class))).thenReturn(bookingSlots);
+
+            when(slotAt18.getTime()).thenReturn(LocalTime.of(18, 0));
+            when(slotAt18.isBooked()).thenReturn(false);
+
+            when(unavailableSlotAt18.getTime()).thenReturn(LocalTime.of(18, 0));
+            when(unavailableSlotAt18.isBooked()).thenReturn(true);
+
+            when(unavailableSlotAt19.getTime()).thenReturn(LocalTime.of(19, 0));
+            when(unavailableSlotAt19.isBooked()).thenReturn(true);
 
             // when
             DailyBookingStatusRes response = bookingService.getDailyBookingStatus(placeId, date);
@@ -109,10 +124,6 @@ class BookingServiceTest {
             assertThat(response.timeList().get(0).available()).isTrue();
             assertThat(response.timeList().get(1).time()).isEqualTo(LocalTime.of(19, 0));
             assertThat(response.timeList().get(1).available()).isFalse();
-        }
-
-        private BookingSlot createBookingSlot(LocalTime time, boolean isBooked) {
-            return new BookingSlot(null, placeId, null, date, time, isBooked, false, false, null);
         }
     }
 
