@@ -1,5 +1,8 @@
 package com.nowait.domain.model.booking;
 
+import static java.util.Objects.isNull;
+import static java.util.Objects.nonNull;
+
 import com.nowait.domain.model.BaseTimeEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -40,6 +43,9 @@ public class Booking extends BaseTimeEntity {
     private Integer partySize;
 
     public static Booking of(Long userId, BookingSlot slot, Integer partySize) {
+        validateUserId(userId);
+        validateBookingSlot(slot);
+        validatePartySize(partySize);
         return new Booking(
             null,
             slot.getId(),
@@ -47,5 +53,23 @@ public class Booking extends BaseTimeEntity {
             slot.book(),
             partySize
         );
+    }
+
+    private static void validateUserId(Long userId) {
+        if (isNull(userId)) {
+            throw new IllegalArgumentException("예약자 식별자는 필수값입니다.");
+        }
+    }
+
+    private static void validateBookingSlot(BookingSlot slot) {
+        if (isNull(slot)) {
+            throw new IllegalArgumentException("예약 슬롯은 필수값입니다.");
+        }
+    }
+
+    private static void validatePartySize(Integer partySize) {
+        if (nonNull(partySize) && partySize <= 0) {
+            throw new IllegalArgumentException("인원 수는 0이상 입니다.");
+        }
     }
 }
