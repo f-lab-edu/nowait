@@ -168,7 +168,6 @@ class BookingServiceUnitTest {
             when(bookingSlotRepository.findFirstByPlaceIdAndDateAndTimeAndIsBookedFalse(
                 placeId, date, time)).thenReturn(Optional.of(slot));
             when(bookingRepository.save(any(Booking.class))).thenReturn(booking);
-            when(slot.book()).thenReturn(BookingStatus.CONFIRMED);
             when(booking.getStatus()).thenReturn(BookingStatus.CONFIRMED);
 
             // when

@@ -12,4 +12,9 @@ public enum BookingStatus {
     CANCELLED("취소됨");
 
     private final String description;
+
+    public static BookingStatus getStatusAfterBook(BookingSlot slot) {
+        return slot.isDepositRequired() ? PENDING_PAYMENT
+            : slot.isConfirmRequired() ? PENDING_CONFIRM : CONFIRMED;
+    }
 }

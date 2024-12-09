@@ -50,14 +50,14 @@ public class BookingSlot extends BaseTimeEntity {
     @Column(name = "deposit_policy_id")
     private Long deposit_policy_id;
 
-    public BookingStatus book() {
+    public void book() {
+        validateBookingPossible();
+        isBooked = true;
+    }
+
+    private void validateBookingPossible() {
         if (isBooked) {
             throw new IllegalArgumentException("이미 예약된 테이블입니다.");
         }
-
-        isBooked = true;
-
-        return isDepositRequired() ? BookingStatus.PENDING_PAYMENT
-            : isConfirmRequired() ? BookingStatus.PENDING_CONFIRM : BookingStatus.CONFIRMED;
     }
 }
