@@ -40,7 +40,7 @@ public class Booking extends BaseTimeEntity {
     private BookingStatus status;
 
     @Column(name = "party_size")
-    private Integer partySize;
+    private int partySize;
 
     public static Booking of(Long userId, BookingSlot slot, Integer partySize) {
         validateUserId(userId);
@@ -53,8 +53,8 @@ public class Booking extends BaseTimeEntity {
             null,
             slot.getId(),
             userId,
-            BookingStatus.getStatusAfterBook(slot),
-            partySize
+            BookingStatus.getStatusAfterBooking(slot),
+            isNull(partySize) ? 1 : partySize
         );
     }
 
