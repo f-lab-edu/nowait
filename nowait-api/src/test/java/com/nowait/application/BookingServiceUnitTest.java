@@ -95,6 +95,8 @@ class BookingServiceUnitTest {
             assertThat(response.timeList().get(0).available()).isTrue();
             assertThat(response.timeList().get(1).time()).isEqualTo(LocalTime.of(19, 0));
             assertThat(response.timeList().get(1).available()).isFalse();
+
+            verify(bookingSlotRepository).findAllByPlaceIdAndDate(placeId, date);
         }
 
         @DisplayName("해당 시간의 모든 테이블이 예약된 경우에만 예약 불가능한 상태가 된다")
@@ -125,6 +127,8 @@ class BookingServiceUnitTest {
             assertThat(response.timeList().get(0).available()).isTrue();
             assertThat(response.timeList().get(1).time()).isEqualTo(LocalTime.of(19, 0));
             assertThat(response.timeList().get(1).available()).isFalse();
+
+            verify(bookingSlotRepository).findAllByPlaceIdAndDate(placeId, date);
         }
     }
 
