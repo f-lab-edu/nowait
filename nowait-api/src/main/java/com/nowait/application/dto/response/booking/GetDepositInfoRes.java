@@ -1,4 +1,4 @@
-package com.nowait.controller.api.dto.response.booking;
+package com.nowait.application.dto.response.booking;
 
 public record GetDepositInfoRes(
     Long bookingId,

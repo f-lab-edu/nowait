@@ -1,4 +1,4 @@
-package com.nowait.controller.api.dto.response.booking;
+package com.nowait.application.dto.response.booking;
 
 import java.time.LocalDate;
 import java.util.List;

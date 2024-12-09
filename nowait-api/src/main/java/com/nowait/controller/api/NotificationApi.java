@@ -1,7 +1,7 @@
 package com.nowait.controller.api;
 
-import com.nowait.controller.api.dto.ApiResult;
 import com.nowait.controller.api.dto.request.SetVacancyNotificationReq;
+import com.nowait.controller.api.dto.response.ApiResult;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;

@@ -1,9 +1,9 @@
 package com.nowait.application;
 
+import com.nowait.application.dto.response.booking.BookingRes;
+import com.nowait.application.dto.response.booking.DailyBookingStatusRes;
+import com.nowait.application.dto.response.booking.TimeSlotDto;
 import com.nowait.application.event.BookingEventPublisher;
-import com.nowait.controller.api.dto.response.booking.BookingRes;
-import com.nowait.controller.api.dto.response.booking.DailyBookingStatusRes;
-import com.nowait.controller.api.dto.response.booking.TimeSlotDto;
 import com.nowait.domain.model.booking.Booking;
 import com.nowait.domain.model.booking.BookingSlot;
 import com.nowait.domain.repository.BookingRepository;

@@ -1,4 +1,4 @@
-package com.nowait.controller.api.dto.response.payment;
+package com.nowait.application.dto.response.payment;
 
 public record PayDepositRes(
     Long paymentId,

@@ -2,12 +2,12 @@ package com.nowait.controller.api;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.nowait.controller.api.dto.ApiResult;
+import com.nowait.application.dto.response.booking.BookingRes;
+import com.nowait.application.dto.response.booking.DailyBookingStatusRes;
+import com.nowait.application.dto.response.booking.GetBookingInfoRes;
+import com.nowait.application.dto.response.booking.GetDepositInfoRes;
 import com.nowait.controller.api.dto.request.BookingReq;
-import com.nowait.controller.api.dto.response.booking.BookingRes;
-import com.nowait.controller.api.dto.response.booking.DailyBookingStatusRes;
-import com.nowait.controller.api.dto.response.booking.GetBookingInfoRes;
-import com.nowait.controller.api.dto.response.booking.GetDepositInfoRes;
+import com.nowait.controller.api.dto.response.ApiResult;
 import com.nowait.domain.repository.BookingSlotRepository;
 import java.time.LocalDate;
 import java.time.LocalTime;

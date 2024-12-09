@@ -1,4 +1,4 @@
-package com.nowait.controller.api.dto.response.booking;
+package com.nowait.application.dto.response.booking;
 
 import com.nowait.domain.model.booking.Booking;
 import com.nowait.domain.model.booking.BookingSlot;

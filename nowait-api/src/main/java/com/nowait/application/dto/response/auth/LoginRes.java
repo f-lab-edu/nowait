@@ -1,4 +1,4 @@
-package com.nowait.controller.api.dto.response.auth;
+package com.nowait.application.dto.response.auth;
 
 public record LoginRes(
     String accessToken,

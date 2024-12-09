@@ -9,8 +9,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
+import com.nowait.application.dto.response.booking.DailyBookingStatusRes;
 import com.nowait.application.event.BookingEventPublisher;
-import com.nowait.controller.api.dto.response.booking.DailyBookingStatusRes;
 import com.nowait.domain.model.booking.Booking;
 import com.nowait.domain.model.booking.BookingSlot;
 import com.nowait.domain.model.booking.BookingStatus;

@@ -1,8 +1,8 @@
 package com.nowait.controller.api;
 
-import com.nowait.controller.api.dto.ApiResult;
+import com.nowait.application.dto.response.payment.PayDepositRes;
 import com.nowait.controller.api.dto.request.PayDepositReq;
-import com.nowait.controller.api.dto.response.payment.PayDepositRes;
+import com.nowait.controller.api.dto.response.ApiResult;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;

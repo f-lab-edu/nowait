@@ -1,9 +1,9 @@
 package com.nowait.controller.api;
 
-import com.nowait.controller.api.dto.ApiResult;
+import com.nowait.application.dto.response.auth.GetLoginPageRes;
+import com.nowait.application.dto.response.auth.LoginRes;
 import com.nowait.controller.api.dto.request.ReissueTokenReq;
-import com.nowait.controller.api.dto.response.auth.GetLoginPageRes;
-import com.nowait.controller.api.dto.response.auth.LoginRes;
+import com.nowait.controller.api.dto.response.ApiResult;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;

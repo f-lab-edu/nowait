@@ -1,4 +1,4 @@
-package com.nowait.controller.api.dto;
+package com.nowait.controller.api.dto.response;
 
 import org.springframework.http.HttpStatus;
 
