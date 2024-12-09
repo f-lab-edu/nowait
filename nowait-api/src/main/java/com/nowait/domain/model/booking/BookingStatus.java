@@ -13,7 +13,7 @@ public enum BookingStatus {
 
     private final String description;
 
-    public static BookingStatus getStatusAfterBook(BookingSlot slot) {
+    public static BookingStatus getStatusAfterBooking(BookingSlot slot) {
         return slot.isDepositRequired() ? PENDING_PAYMENT
             : slot.isConfirmRequired() ? PENDING_CONFIRM : CONFIRMED;
     }
