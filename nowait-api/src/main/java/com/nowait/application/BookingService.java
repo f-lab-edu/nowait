@@ -47,7 +47,7 @@ public class BookingService {
         placeService.validatePlaceExist(placeId, "존재하지 않는 식당입니다.");
 
         BookingSlot slot = findAvailableSlot(placeId, date, time);
-        Booking booking = bookingRepository.save(Booking.of(loginId, partySize, slot));
+        Booking booking = bookingRepository.save(Booking.of(loginId, slot, partySize));
 
         bookingEventPublisher.publishBookedEvent(booking, placeId);
 

@@ -39,7 +39,7 @@ public class Booking extends BaseTimeEntity {
     @Column(name = "party_size")
     private Integer partySize;
 
-    public static Booking of(Long userId, Integer partySize, BookingSlot slot) {
+    public static Booking of(Long userId, BookingSlot slot, Integer partySize) {
         return new Booking(
             null,
             slot.getId(),
