@@ -56,8 +56,8 @@ public class BookingSlot extends BaseTimeEntity {
     }
 
     private void validateBookingPossible() {
-        if (isBooked) {
-            throw new IllegalArgumentException("이미 예약된 테이블입니다.");
+        if (isBooked()) {
+            throw new IllegalArgumentException("이미 예약된 슬롯입니다.");
         }
     }
 }
