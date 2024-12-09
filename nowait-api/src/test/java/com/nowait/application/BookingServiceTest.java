@@ -3,6 +3,8 @@ package com.nowait.application;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
@@ -14,8 +16,6 @@ import com.nowait.domain.model.booking.BookingSlot;
 import com.nowait.domain.model.booking.BookingStatus;
 import com.nowait.domain.repository.BookingRepository;
 import com.nowait.domain.repository.BookingSlotRepository;
-import com.nowait.domain.repository.PlaceRepository;
-import com.nowait.domain.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -43,13 +43,13 @@ class BookingServiceTest {
     BookingRepository bookingRepository;
 
     @Mock
-    UserRepository userRepository;
-
-    @Mock
-    PlaceRepository placeRepository;
-
-    @Mock
     BookingEventPublisher bookingEventPublisher;
+
+    @Mock
+    UserService userService;
+
+    @Mock
+    PlaceService placeService;
 
     @Nested
     @DisplayName("예약 현황 조회 테스트")
@@ -141,6 +141,8 @@ class BookingServiceTest {
         LocalDate date;
         LocalTime time;
         int partySize;
+        String userNotExistMessage;
+        String placeNotExistMessage;
 
         @BeforeEach
         void setUp() {
@@ -149,14 +151,16 @@ class BookingServiceTest {
             date = LocalDate.of(2024, 12, 25);
             time = LocalTime.of(18, 0);
             partySize = 2;
+            userNotExistMessage = "존재하지 않는 사용자의 요청입니다.";
+            placeNotExistMessage = "존재하지 않는 식당입니다.";
         }
 
         @DisplayName("예약 가능한 날짜, 시간에 예약을 할 수 있다.")
         @Test
         void book() {
             // given
-            when(userRepository.existsById(loginId)).thenReturn(true);
-            when(placeRepository.existsById(placeId)).thenReturn(true);
+            doNothing().when(userService).validateUserExist(loginId, userNotExistMessage);
+            doNothing().when(placeService).validatePlaceExist(placeId, placeNotExistMessage);
             when(bookingSlotRepository.findFirstByPlaceIdAndDateAndTimeAndIsBookedFalse(
                 placeId, date, time)).thenReturn(Optional.of(slot));
             when(bookingRepository.save(any(Booking.class))).thenReturn(booking);
@@ -167,8 +171,8 @@ class BookingServiceTest {
             bookingService.book(loginId, placeId, date, time, partySize);
 
             // then
-            verify(userRepository).existsById(loginId);
-            verify(placeRepository).existsById(placeId);
+            verify(userService).validateUserExist(loginId, userNotExistMessage);
+            verify(placeService).validatePlaceExist(placeId, placeNotExistMessage);
             verify(bookingSlotRepository).findFirstByPlaceIdAndDateAndTimeAndIsBookedFalse(
                 placeId, date, time);
             verify(bookingRepository).save(any(Booking.class));
@@ -179,8 +183,8 @@ class BookingServiceTest {
         @Test
         void alreadyFullyBooked() {
             // given
-            when(userRepository.existsById(loginId)).thenReturn(true);
-            when(placeRepository.existsById(placeId)).thenReturn(true);
+            doNothing().when(userService).validateUserExist(loginId, userNotExistMessage);
+            doNothing().when(placeService).validatePlaceExist(placeId, placeNotExistMessage);
             when(bookingSlotRepository.findFirstByPlaceIdAndDateAndTimeAndIsBookedFalse(
                 placeId, date, time)).thenReturn(Optional.empty());
 
@@ -189,8 +193,8 @@ class BookingServiceTest {
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("예약 가능한 테이블이 없습니다.");
 
-            verify(userRepository).existsById(loginId);
-            verify(placeRepository).existsById(placeId);
+            verify(userService).validateUserExist(loginId, userNotExistMessage);
+            verify(placeService).validatePlaceExist(placeId, placeNotExistMessage);
             verify(bookingSlotRepository).findFirstByPlaceIdAndDateAndTimeAndIsBookedFalse(
                 placeId, date, time);
             verifyNoInteractions(bookingRepository, bookingEventPublisher);
@@ -200,15 +204,17 @@ class BookingServiceTest {
         @Test
         void bookByNonExistUser() {
             // given
-            when(userRepository.existsById(loginId)).thenReturn(false);
+            doThrow(new EntityNotFoundException(userNotExistMessage))
+                .when(userService)
+                .validateUserExist(loginId, userNotExistMessage);
 
             // when & then
             assertThatThrownBy(() -> bookingService.book(loginId, placeId, date, time, partySize))
                 .isInstanceOf(EntityNotFoundException.class)
-                .hasMessage("존재하지 않는 사용자의 요청입니다.");
+                .hasMessage(userNotExistMessage);
 
-            verify(userRepository).existsById(loginId);
-            verifyNoInteractions(placeRepository, bookingSlotRepository, bookingRepository,
+            verify(userService).validateUserExist(loginId, userNotExistMessage);
+            verifyNoInteractions(placeService, bookingSlotRepository, bookingRepository,
                 bookingEventPublisher);
         }
 
@@ -216,16 +222,18 @@ class BookingServiceTest {
         @Test
         void bookWithNonExistPlace() {
             // given
-            when(userRepository.existsById(loginId)).thenReturn(true);
-            when(placeRepository.existsById(placeId)).thenReturn(false);
+            doNothing().when(userService).validateUserExist(loginId, userNotExistMessage);
+            doThrow(new EntityNotFoundException(placeNotExistMessage))
+                .when(placeService)
+                .validatePlaceExist(placeId, placeNotExistMessage);
 
             // when & then
             assertThatThrownBy(() -> bookingService.book(loginId, placeId, date, time, partySize))
                 .isInstanceOf(EntityNotFoundException.class)
                 .hasMessage("존재하지 않는 식당입니다.");
 
-            verify(userRepository).existsById(loginId);
-            verify(placeRepository).existsById(placeId);
+            verify(userService).validateUserExist(loginId, userNotExistMessage);
+            verify(placeService).validatePlaceExist(placeId, placeNotExistMessage);
             verifyNoInteractions(bookingSlotRepository, bookingRepository, bookingEventPublisher);
         }
     }
