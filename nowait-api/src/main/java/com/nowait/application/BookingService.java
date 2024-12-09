@@ -8,9 +8,6 @@ import com.nowait.domain.model.booking.Booking;
 import com.nowait.domain.model.booking.BookingSlot;
 import com.nowait.domain.repository.BookingRepository;
 import com.nowait.domain.repository.BookingSlotRepository;
-import com.nowait.domain.repository.PlaceRepository;
-import com.nowait.domain.repository.UserRepository;
-import jakarta.persistence.EntityNotFoundException;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
@@ -26,9 +23,9 @@ public class BookingService {
 
     private final BookingSlotRepository bookingSlotRepository;
     private final BookingRepository bookingRepository;
-    private final UserRepository userRepository;
-    private final PlaceRepository placeRepository;
     private final BookingEventPublisher bookingEventPublisher;
+    private final UserService userService;
+    private final PlaceService placeService;
 
     public DailyBookingStatusRes getDailyBookingStatus(Long placeId, LocalDate date) {
         List<BookingSlot> bookingSlots = bookingSlotRepository.findAllByPlaceIdAndDate(
@@ -46,8 +43,8 @@ public class BookingService {
     @Transactional
     public BookingRes book(Long loginId, Long placeId, LocalDate date, LocalTime time,
         Integer partySize) {
-        validateUserExist(loginId, "존재하지 않는 사용자의 요청입니다.");
-        validatePlaceExist(placeId, "존재하지 않는 식당입니다.");
+        userService.validateUserExist(loginId, "존재하지 않는 사용자의 요청입니다.");
+        placeService.validatePlaceExist(placeId, "존재하지 않는 식당입니다.");
 
         BookingSlot slot = findAvailableSlot(placeId, date, time);
         Booking booking = bookingRepository.save(Booking.of(loginId, partySize, slot));
@@ -60,18 +57,6 @@ public class BookingService {
     private boolean isAvailable(List<BookingSlot> slots) {
         // 모든 슬롯이 예약된 경우에만 false 반환
         return slots.stream().anyMatch(slot -> !slot.isBooked());
-    }
-
-    private void validateUserExist(Long userId, String errorMessage) {
-        if (!userRepository.existsById(userId)) {
-            throw new EntityNotFoundException(errorMessage);
-        }
-    }
-
-    private void validatePlaceExist(Long placeId, String errorMessage) {
-        if (!placeRepository.existsById(placeId)) {
-            throw new EntityNotFoundException(errorMessage);
-        }
     }
 
     private BookingSlot findAvailableSlot(Long placeId, LocalDate date, LocalTime time) {
