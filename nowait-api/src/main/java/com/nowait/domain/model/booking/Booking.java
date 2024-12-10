@@ -2,6 +2,7 @@ package com.nowait.domain.model.booking;
 
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
+import static java.util.Objects.requireNonNull;
 
 import com.nowait.domain.model.BaseTimeEntity;
 import jakarta.persistence.Column;
@@ -59,15 +60,11 @@ public class Booking extends BaseTimeEntity {
     }
 
     private static void validateUserId(Long userId) {
-        if (isNull(userId)) {
-            throw new IllegalArgumentException("예약자 식별자는 필수값입니다.");
-        }
+        requireNonNull(userId, "예약자 식별자는 필수값입니다.");
     }
 
     private static void validateBookingSlot(BookingSlot slot) {
-        if (isNull(slot)) {
-            throw new IllegalArgumentException("예약 슬롯은 필수값입니다.");
-        }
+        requireNonNull(slot, "예약 슬롯은 필수값입니다.");
     }
 
     private static void validatePartySize(Integer partySize) {
