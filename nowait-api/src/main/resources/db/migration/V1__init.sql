@@ -33,8 +33,6 @@ CREATE TABLE booking_slot
     deposit_required  BOOLEAN   NOT NULL,
     confirm_required  BOOLEAN   NOT NULL,
     deposit_policy_id BIGINT,
-    start_time        TIMESTAMP NOT NULL,
-    end_time          TIMESTAMP NOT NULL,
     created_at        TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at        TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON update CURRENT_TIMESTAMP
 );
