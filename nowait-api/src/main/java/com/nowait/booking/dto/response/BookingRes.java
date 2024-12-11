@@ -13,7 +13,7 @@ public record BookingRes(
     public static BookingRes of(Booking booking, BookingSlot slot) {
         return new BookingRes(
             booking.getId(),
-            booking.getStatus().getDescription(),
+            booking.getStatus().name(),
             slot.isDepositRequired(),
             slot.isConfirmRequired()
         );
