@@ -2,7 +2,6 @@ package com.nowait.booking.api;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.nowait.booking.domain.repository.BookingSlotRepository;
 import com.nowait.booking.dto.request.BookingReq;
 import com.nowait.booking.dto.response.BookingRes;
 import com.nowait.booking.dto.response.DailyBookingStatusRes;
@@ -31,9 +30,6 @@ class BookingApiIntegrationTest {
 
     @Autowired
     TestRestTemplate template;
-
-    @Autowired
-    BookingSlotRepository bookingSlotRepository;
 
     String authorization;
 
