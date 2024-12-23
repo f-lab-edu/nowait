@@ -48,7 +48,7 @@ public class BookingSlot extends BaseTimeEntity {
     private boolean confirmRequired;
 
     @Column(name = "deposit_policy_id")
-    private Long deposit_policy_id;
+    private Long depositPolicyId;
 
     public void book() {
         validateBookingPossible();
