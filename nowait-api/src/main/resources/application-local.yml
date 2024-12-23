@@ -12,3 +12,12 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.MySQLDialect
         format_sql: true
+
+payment:
+  kakao-pay:
+    cid: ${KAKAO_PAY_CID}
+    secretKey: ${KAKAO_PAY_SECRET_KEY}
+    readyRequestUrl: ${KAKAO_PAY_READY_REQUEST_URL}
+    approvalUrl: ${KAKAO_PAY_APPROVAL_URL}
+    cancelUrl: ${KAKAO_PAY_CANCEL_URL}
+    failUrl: ${KAKAO_PAY_FAIL_URL}
