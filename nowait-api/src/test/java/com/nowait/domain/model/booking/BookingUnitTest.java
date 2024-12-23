@@ -60,7 +60,7 @@ class BookingUnitTest {
     void makeBookWithoutUserId() {
         // when & then
         assertThatThrownBy(() -> Booking.of(null, slot, partySize))
-            .isInstanceOf(IllegalArgumentException.class)
+            .isInstanceOf(NullPointerException.class)
             .hasMessage("예약자 식별자는 필수값입니다.");
 
         verifyNoInteractions(slot);
@@ -71,7 +71,7 @@ class BookingUnitTest {
     void makeBookWithoutSlot() {
         // when & then
         assertThatThrownBy(() -> Booking.of(userId, null, partySize))
-            .isInstanceOf(IllegalArgumentException.class)
+            .isInstanceOf(NullPointerException.class)
             .hasMessage("예약 슬롯은 필수값입니다.");
 
         verifyNoInteractions(slot);
