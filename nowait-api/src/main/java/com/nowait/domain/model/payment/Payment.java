@@ -1,5 +1,7 @@
 package com.nowait.domain.model.payment;
 
+import static java.util.Objects.requireNonNull;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -26,6 +28,18 @@ public class Payment {
     private String tid;
 
     public static Payment of(Long bookingId, String tid) {
+        validateBookingId(bookingId);
+        validateTid(tid);
+
         return new Payment(null, bookingId, tid);
     }
+
+    private static void validateBookingId(Long bookingId) {
+        requireNonNull(bookingId, "예약 식별자는 필수값입니다.");
+    }
+
+    private static void validateTid(String tid) {
+        requireNonNull(tid, "TID는 필수값입니다.");
+    }
+
 }
