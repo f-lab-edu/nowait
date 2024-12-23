@@ -59,6 +59,12 @@ public class Booking extends BaseTimeEntity {
         );
     }
 
+    public void validateOwner(Long userId) {
+        if (!this.userId.equals(userId)) {
+            throw new IllegalArgumentException("예약자가 아닙니다.");
+        }
+    }
+
     private static void validateUserId(Long userId) {
         requireNonNull(userId, "예약자 식별자는 필수값입니다.");
     }

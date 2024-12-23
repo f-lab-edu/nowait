@@ -4,10 +4,13 @@ import com.nowait.application.dto.response.booking.BookingRes;
 import com.nowait.application.dto.response.booking.DailyBookingStatusRes;
 import com.nowait.application.dto.response.booking.TimeSlotDto;
 import com.nowait.application.event.BookingEventPublisher;
+import com.nowait.domain.model.booking.AmountDepositPolicy;
 import com.nowait.domain.model.booking.Booking;
 import com.nowait.domain.model.booking.BookingSlot;
+import com.nowait.domain.model.booking.DepositPolicy;
 import com.nowait.domain.repository.BookingRepository;
 import com.nowait.domain.repository.BookingSlotRepository;
+import jakarta.persistence.EntityNotFoundException;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
@@ -52,6 +55,21 @@ public class BookingService {
         bookingEventPublisher.publishBookedEvent(booking, placeId);
 
         return BookingRes.of(booking, slot);
+    }
+
+    public Booking getById(Long bookingId) {
+        return bookingRepository.findById(bookingId)
+            .orElseThrow(() -> new EntityNotFoundException("예약 정보가 존재하지 않습니다."));
+    }
+
+    public BookingSlot getBookingSlotById(Long bookingSlotId) {
+        return bookingSlotRepository.findById(bookingSlotId)
+            .orElseThrow(() -> new EntityNotFoundException("예약 슬롯이 존재하지 않습니다."));
+    }
+
+    public DepositPolicy getDepositPolicyById(Long depositPolicyId) {
+        // TODO: 데이터베이스에서 depositPolicyId를 통해 DepositPolicy를 찾아서 반환
+        return new AmountDepositPolicy(10_000);
     }
 
     private boolean isAvailable(List<BookingSlot> slots) {
