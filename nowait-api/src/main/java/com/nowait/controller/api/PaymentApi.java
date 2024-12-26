@@ -19,10 +19,10 @@ import org.springframework.web.bind.annotation.RestController;
 public class PaymentApi {
 
     /**
-     * 예약금 결제 url 요청 API
+     * 예약금 결제 준비 요청 API
      *
-     * @param request 예약금 결제 url 요청
-     * @return 예약금 결제 url
+     * @param request 예약금 결제 준비 요청
+     * @return 예약금 결제 준비 응답 (결제 식별자, 간편결제 redirect url)
      */
     @PostMapping("/deposit/ready")
     public ApiResult<ReadyDepositPaymentRes> getDepositPaymentUrl(
