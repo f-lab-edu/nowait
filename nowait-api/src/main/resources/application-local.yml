@@ -18,6 +18,7 @@ payment:
     cid: TC0ONETIME
     secretKey: ${KAKAO_PAY_SECRET_KEY}
     readyRequestUrl: https://open-api.kakaopay.com/online/v1/payment/ready
+    approveRequestUrl: https://open-api.kakaopay.com/online/v1/payment/approve
     approvalUrl: ${KAKAO_PAY_APPROVAL_URL}
     cancelUrl: ${KAKAO_PAY_CANCEL_URL}
     failUrl: ${KAKAO_PAY_FAIL_URL}
