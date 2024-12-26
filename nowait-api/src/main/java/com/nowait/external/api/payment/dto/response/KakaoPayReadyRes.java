@@ -1,4 +1,4 @@
-package com.nowait.external.api.payment.dto;
+package com.nowait.external.api.payment.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.time.LocalDateTime;

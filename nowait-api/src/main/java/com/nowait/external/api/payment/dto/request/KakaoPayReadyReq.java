@@ -1,4 +1,4 @@
-package com.nowait.external.api.payment.dto;
+package com.nowait.external.api.payment.dto.request;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.nowait.domain.model.booking.Booking;
