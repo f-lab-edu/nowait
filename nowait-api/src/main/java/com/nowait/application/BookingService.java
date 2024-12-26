@@ -8,6 +8,7 @@ import com.nowait.domain.model.booking.Booking;
 import com.nowait.domain.model.booking.BookingSlot;
 import com.nowait.domain.repository.BookingRepository;
 import com.nowait.domain.repository.BookingSlotRepository;
+import jakarta.persistence.EntityNotFoundException;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
@@ -43,8 +44,8 @@ public class BookingService {
     @Transactional
     public BookingRes book(Long loginId, Long placeId, LocalDate date, LocalTime time,
         Integer partySize) {
-        userService.validateUserExist(loginId, "존재하지 않는 사용자의 요청입니다.");
-        placeService.validatePlaceExist(placeId, "존재하지 않는 식당입니다.");
+        validateUserExist(loginId, "존재하지 않는 사용자의 요청입니다.");
+        validatePlaceExist(placeId, "존재하지 않는 식당입니다.");
 
         BookingSlot slot = findAvailableSlot(placeId, date, time);
         Booking booking = bookingRepository.save(Booking.of(loginId, slot, partySize));
@@ -62,5 +63,17 @@ public class BookingService {
     private BookingSlot findAvailableSlot(Long placeId, LocalDate date, LocalTime time) {
         return bookingSlotRepository.findFirstByPlaceIdAndDateAndTimeAndIsBookedFalse(placeId, date,
             time).orElseThrow(() -> new IllegalArgumentException("예약 가능한 테이블이 없습니다."));
+    }
+
+    private void validateUserExist(Long userId, String errorMessage) {
+        if (!userService.existsById(userId)) {
+            throw new EntityNotFoundException(errorMessage);
+        }
+    }
+
+    private void validatePlaceExist(Long placeId, String errorMessage) {
+        if (!placeService.existsById(placeId)) {
+            throw new EntityNotFoundException(errorMessage);
+        }
     }
 }
