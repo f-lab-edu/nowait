@@ -15,9 +15,9 @@ spring:
 
 payment:
   kakao-pay:
-    cid: ${KAKAO_PAY_CID}
+    cid: TC0ONETIME
     secretKey: ${KAKAO_PAY_SECRET_KEY}
-    readyRequestUrl: ${KAKAO_PAY_READY_REQUEST_URL}
+    readyRequestUrl: https://open-api.kakaopay.com/online/v1/payment/ready
     approvalUrl: ${KAKAO_PAY_APPROVAL_URL}
     cancelUrl: ${KAKAO_PAY_CANCEL_URL}
     failUrl: ${KAKAO_PAY_FAIL_URL}
