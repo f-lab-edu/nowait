@@ -2,6 +2,7 @@ package com.nowait.domain.model.payment;
 
 import static java.util.Objects.requireNonNull;
 
+import com.nowait.application.dto.response.payment.PaymentResult;
 import com.nowait.domain.model.BaseTimeEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -16,13 +17,14 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Entity
 @Table(name = "payment")
 @Getter
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Payment {
+@Slf4j
 public class Payment extends BaseTimeEntity {
 
     @Id
@@ -69,6 +71,13 @@ public class Payment extends BaseTimeEntity {
             null);
     }
 
+    public void updatePaymentResult(PaymentResult result) {
+        requireNonNull(result, "결제 결과는 필수값입니다.");
+        requireNonNull(result.approvedAt(), "결제 승인 시각은 필수값입니다.");
+        validateAmount(result.totalAmount());
+
+        this.approvedAt = result.approvedAt();
+    }
 
     private static void validateBookingId(Long bookingId) {
         requireNonNull(bookingId, "예약 식별자는 필수값입니다.");
@@ -82,4 +91,9 @@ public class Payment extends BaseTimeEntity {
         requireNonNull(paymentType, "결제 수단은 필수값입니다.");
     }
 
+    private void validateAmount(int payAmount) {
+        if (this.totalAmount != payAmount) {
+            log.error("결제 금액이 일치하지 않습니다. [결제금액: {}, 결제승인금액: {}]", this.totalAmount, payAmount);
+        }
+    }
 }

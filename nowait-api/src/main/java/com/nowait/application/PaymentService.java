@@ -2,6 +2,7 @@ package com.nowait.application;
 
 import com.nowait.application.dto.response.payment.GetDepositPaymentUrlRes;
 import com.nowait.application.dto.response.payment.PaymentInfo;
+import com.nowait.application.dto.response.payment.PaymentResult;
 import com.nowait.domain.model.booking.Booking;
 import com.nowait.domain.model.booking.BookingSlot;
 import com.nowait.domain.model.booking.DepositPolicy;
@@ -39,6 +40,25 @@ public class PaymentService {
                 paymentInfo.createdAt()));
 
         return new GetDepositPaymentUrlRes(paymentInfo.redirectPcUrl());
+    }
+
+    @Transactional
+    public void approve(Long loginId, Long paymentId, String pgToken) {
+        Payment payment = getById(paymentId);
+        Booking booking = bookingService.getById(payment.getBookingId());
+
+        booking.validateOwner(loginId);
+
+        PaymentGateway paymentGateway = paymentGatewayFactory.createPaymentGateway(
+            payment.getPaymentType());
+
+        PaymentResult result = paymentGateway.approve(loginId, payment, pgToken);
+        payment.updatePaymentResult(result);
+    }
+
+    private Payment getById(Long paymentId) {
+        return paymentRepository.findById(paymentId)
+            .orElseThrow(() -> new IllegalArgumentException("결제 정보가 존재하지 않습니다."));
     }
 
     private void validateDepositAmount(int amount, Booking booking, DepositPolicy depositPolicy) {
