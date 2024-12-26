@@ -27,12 +27,27 @@ public class Payment {
     private Long bookingId;
     private String tid;
 
-    public static Payment of(Long bookingId, String tid) {
+    @Enumerated(value = EnumType.STRING)
+    @Column(name = "type", nullable = false, columnDefinition = "varchar(30)")
+    private PaymentType paymentType;
+
+    public static Payment of(Long bookingId, String tid, PaymentType paymentType,
+        int amount, LocalDateTime readyAt) {
         validateBookingId(bookingId);
         validateTid(tid);
+        validatePaymentType(paymentType);
 
-        return new Payment(null, bookingId, tid);
+        return new Payment(
+            null,
+            bookingId,
+            tid,
+            paymentType,
+            amount,
+            readyAt,
+            null,
+            null);
     }
+
 
     private static void validateBookingId(Long bookingId) {
         requireNonNull(bookingId, "예약 식별자는 필수값입니다.");
@@ -40,6 +55,10 @@ public class Payment {
 
     private static void validateTid(String tid) {
         requireNonNull(tid, "TID는 필수값입니다.");
+    }
+
+    private static void validatePaymentType(PaymentType paymentType) {
+        requireNonNull(paymentType, "결제 수단은 필수값입니다.");
     }
 
 }
