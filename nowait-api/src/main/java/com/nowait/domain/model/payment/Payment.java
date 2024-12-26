@@ -2,12 +2,16 @@ package com.nowait.domain.model.payment;
 
 import static java.util.Objects.requireNonNull;
 
+import com.nowait.domain.model.BaseTimeEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -19,17 +23,34 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Payment {
+public class Payment extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Long id;
+
+    @Column(name = "booking_id", nullable = false)
     private Long bookingId;
+
+    @Column(name = "tid", nullable = false)
     private String tid;
 
     @Enumerated(value = EnumType.STRING)
     @Column(name = "type", nullable = false, columnDefinition = "varchar(30)")
     private PaymentType paymentType;
+
+    @Column(name = "total_amount")
+    private int totalAmount;
+
+    @Column(name = "ready_at")
+    private LocalDateTime readyAt;
+
+    @Column(name = "approved_at")
+    private LocalDateTime approvedAt;
+
+    @Column(name = "canceled_at")
+    private LocalDateTime canceledAt;
 
     public static Payment of(Long bookingId, String tid, PaymentType paymentType,
         int amount, LocalDateTime readyAt) {

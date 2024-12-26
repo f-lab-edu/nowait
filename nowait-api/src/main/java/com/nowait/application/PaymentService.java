@@ -34,7 +34,9 @@ public class PaymentService {
         booking.validateOwner(loginId);
 
         PaymentInfo paymentInfo = paymentGateway.prepare(loginId, booking, amount);
-        paymentRepository.save(Payment.of(booking.getId(), paymentInfo.tid()));
+        paymentRepository.save(
+            Payment.of(booking.getId(), paymentInfo.tid(), paymentMethod, amount,
+                paymentInfo.createdAt()));
 
         return new GetDepositPaymentUrlRes(paymentInfo.redirectPcUrl());
     }
