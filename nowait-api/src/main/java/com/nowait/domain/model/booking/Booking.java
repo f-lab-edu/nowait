@@ -50,7 +50,7 @@ public class Booking extends BaseTimeEntity {
         validateBookingSlot(slot);
         validatePartySize(partySize);
 
-        slot.book();
+        slot.setBooked(true);
 
         return new Booking(
             null,
