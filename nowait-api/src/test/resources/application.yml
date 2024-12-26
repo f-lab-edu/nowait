@@ -1,7 +1,7 @@
 spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:${TEST_DB_PORT}/nowait_test
+    url: jdbc:mysql://localhost:3308/nowait_test
     username: user
     password: password
 

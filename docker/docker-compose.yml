@@ -10,7 +10,7 @@ services:
       MYSQL_ROOT_PASSWORD: root_password
       TZ: Asia/Seoul
     ports:
-      - "${DB_PORT}:3306"
+      - "3307:3306"
 
   nowait-test-db:
     image: mysql:latest
@@ -21,4 +21,4 @@ services:
       MYSQL_ROOT_PASSWORD: root_password
       TZ: Asia/Seoul
     ports:
-      - "${TEST_DB_PORT}:3306"
+      - "3308:3306"
