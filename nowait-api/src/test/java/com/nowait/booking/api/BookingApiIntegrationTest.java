@@ -1,6 +1,7 @@
 package com.nowait.booking.api;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.test.context.jdbc.Sql.ExecutionPhase;
 
 import com.nowait.booking.dto.request.BookingReq;
 import com.nowait.booking.dto.response.BookingRes;
@@ -24,10 +25,14 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.jdbc.Sql;
+import org.springframework.test.context.jdbc.SqlGroup;
 import org.springframework.web.util.UriComponentsBuilder;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
-@Sql(scripts = {"classpath:/sql/cleanup.sql", "classpath:/sql/data.sql"})
+@SqlGroup({
+    @Sql(scripts = "classpath:/sql/data.sql", executionPhase = ExecutionPhase.BEFORE_TEST_METHOD),
+    @Sql(scripts = "classpath:/sql/cleanup.sql", executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
+})
 class BookingApiIntegrationTest {
 
     @Autowired
