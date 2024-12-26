@@ -19,6 +19,11 @@ public class KakaoPayGateway implements PaymentGateway {
     private final KakaoPayProperties properties;
 
     @Override
+    public boolean supports(PaymentType paymentType) {
+        return PaymentType.KAKAO_PAY.equals(paymentType);
+    }
+
+    @Override
     public PaymentInfo prepare(Long userId, Booking booking, int amount) {
         KakaoPayReadyRes response = RestClient.create()
             .post()

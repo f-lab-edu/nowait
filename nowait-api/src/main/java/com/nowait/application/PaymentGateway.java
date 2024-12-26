@@ -6,4 +6,7 @@ import com.nowait.domain.model.booking.Booking;
 public interface PaymentGateway {
 
     PaymentInfo prepare(Long userId, Booking booking, int amount);
+
+    boolean supports(PaymentType paymentType);
+
 }
