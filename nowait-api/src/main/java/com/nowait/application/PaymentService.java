@@ -6,6 +6,7 @@ import com.nowait.domain.model.booking.Booking;
 import com.nowait.domain.model.booking.BookingSlot;
 import com.nowait.domain.model.booking.DepositPolicy;
 import com.nowait.domain.model.payment.Payment;
+import com.nowait.domain.model.payment.PaymentType;
 import com.nowait.domain.repository.PaymentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -21,7 +22,7 @@ public class PaymentService {
     private final PaymentRepository paymentRepository;
 
     @Transactional
-    public GetDepositPaymentUrlRes prepare(Long loginId, Long bookingId, String paymentMethod,
+    public GetDepositPaymentUrlRes prepare(Long loginId, Long bookingId, PaymentType paymentMethod,
         int amount) {
         PaymentGateway paymentGateway = paymentGatewayFactory.createPaymentGateway(paymentMethod);
         Booking booking = bookingService.getById(bookingId);
