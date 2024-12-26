@@ -50,7 +50,7 @@ class BookingUnitTest {
             assertThat(booking.getStatus()).isEqualTo(BookingStatus.CONFIRMED);
             assertThat(booking.getPartySize()).isEqualTo(partySize);
 
-            verify(slot).book();
+            verify(slot).setBooked(true);
             mockedStatic.verify(() -> BookingStatus.getStatusAfterBooking(slot));
         }
     }
@@ -92,7 +92,7 @@ class BookingUnitTest {
 
             // then
             assertThat(booking.getPartySize()).isEqualTo(1);
-            verify(slot).book();
+            verify(slot).setBooked(true);
         }
     }
 

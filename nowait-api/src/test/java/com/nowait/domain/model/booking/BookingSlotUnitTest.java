@@ -20,7 +20,7 @@ class BookingSlotUnitTest {
     @Test
     void book() {
         // when
-        slot.book();
+        slot.setBooked(true);
 
         // then
         assertThat(slot.isBooked()).isTrue();
@@ -30,10 +30,10 @@ class BookingSlotUnitTest {
     @Test
     void bookAlreadyBookedSlot() {
         // given
-        slot.book();
+        slot.setBooked(true);
 
         // when & then
-        assertThatThrownBy(() -> slot.book())
+        assertThatThrownBy(() -> slot.setBooked(true))
             .isInstanceOf(IllegalArgumentException.class)
             .hasMessage("이미 예약된 슬롯입니다.");
     }
