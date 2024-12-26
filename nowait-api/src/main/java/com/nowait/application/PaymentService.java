@@ -1,8 +1,8 @@
 package com.nowait.application;
 
-import com.nowait.application.dto.response.payment.GetDepositPaymentUrlRes;
 import com.nowait.application.dto.response.payment.PaymentInfo;
 import com.nowait.application.dto.response.payment.PaymentResult;
+import com.nowait.application.dto.response.payment.ReadyDepositPaymentRes;
 import com.nowait.domain.model.booking.Booking;
 import com.nowait.domain.model.booking.BookingSlot;
 import com.nowait.domain.model.booking.DepositPolicy;
@@ -23,9 +23,8 @@ public class PaymentService {
     private final PaymentRepository paymentRepository;
 
     @Transactional
-    public GetDepositPaymentUrlRes prepare(Long loginId, Long bookingId, PaymentType paymentMethod,
+    public ReadyDepositPaymentRes prepare(Long loginId, Long bookingId, PaymentType paymentType,
         int amount) {
-        PaymentGateway paymentGateway = paymentGatewayFactory.createPaymentGateway(paymentMethod);
         Booking booking = bookingService.getById(bookingId);
         BookingSlot slot = bookingService.getBookingSlotById(booking.getBookingSlotId());
         DepositPolicy depositPolicy = bookingService.getDepositPolicyById(
@@ -34,12 +33,13 @@ public class PaymentService {
         validateDepositAmount(amount, booking, depositPolicy);
         booking.validateOwner(loginId);
 
+        PaymentGateway paymentGateway = paymentGatewayFactory.createPaymentGateway(paymentType);
         PaymentInfo paymentInfo = paymentGateway.prepare(loginId, booking, amount);
-        paymentRepository.save(
-            Payment.of(booking.getId(), paymentInfo.tid(), paymentMethod, amount,
+        Payment payment = paymentRepository.save(
+            Payment.of(booking.getId(), paymentInfo.tid(), paymentType, amount,
                 paymentInfo.createdAt()));
 
-        return new GetDepositPaymentUrlRes(paymentInfo.redirectPcUrl());
+        return new ReadyDepositPaymentRes(payment.getId(), paymentInfo.redirectPcUrl());
     }
 
     @Transactional

@@ -1,8 +1,8 @@
 package com.nowait.controller.api.dto.request;
 
-public record GetDepositPaymentUrlReq(
+public record ReadyDepositPaymentReq(
     long bookingId,
-    String paymentMethod,
+    String paymentType,
     int amount
 ) {
 

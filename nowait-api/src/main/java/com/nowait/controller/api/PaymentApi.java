@@ -1,8 +1,8 @@
 package com.nowait.controller.api;
 
-import com.nowait.application.dto.response.payment.GetDepositPaymentUrlRes;
+import com.nowait.application.dto.response.payment.ReadyDepositPaymentRes;
 import com.nowait.controller.api.dto.request.ApproveDepositPaymentReq;
-import com.nowait.controller.api.dto.request.GetDepositPaymentUrlReq;
+import com.nowait.controller.api.dto.request.ReadyDepositPaymentReq;
 import com.nowait.controller.api.dto.response.ApiResult;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -24,9 +24,9 @@ public class PaymentApi {
      * @param request 예약금 결제 url 요청
      * @return 예약금 결제 url
      */
-    @PostMapping("/deposit")
-    public ApiResult<GetDepositPaymentUrlRes> getDepositPaymentUrl(
-        @RequestBody @Valid GetDepositPaymentUrlReq request
+    @PostMapping("/deposit/ready")
+    public ApiResult<ReadyDepositPaymentRes> getDepositPaymentUrl(
+        @RequestBody @Valid ReadyDepositPaymentReq request
     ) {
         // TODO: 예약금 결제 비즈니스 로직 호출
 
