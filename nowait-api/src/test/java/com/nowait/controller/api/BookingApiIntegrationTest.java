@@ -8,7 +8,6 @@ import com.nowait.application.dto.response.booking.GetBookingInfoRes;
 import com.nowait.application.dto.response.booking.GetDepositInfoRes;
 import com.nowait.controller.api.dto.request.BookingReq;
 import com.nowait.controller.api.dto.response.ApiResult;
-import com.nowait.domain.repository.BookingSlotRepository;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import org.junit.jupiter.api.BeforeEach;
@@ -31,9 +30,6 @@ class BookingApiIntegrationTest {
 
     @Autowired
     TestRestTemplate template;
-
-    @Autowired
-    BookingSlotRepository bookingSlotRepository;
 
     String authorization;
 

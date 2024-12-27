@@ -17,4 +17,16 @@ public enum BookingStatus {
         return slot.isDepositRequired() ? PENDING_PAYMENT
             : slot.isConfirmRequired() ? PENDING_CONFIRM : CONFIRMED;
     }
+
+    public static BookingStatus next(BookingStatus status, BookingSlot slot) {
+        if (status == PENDING_CONFIRM) {
+            return CONFIRMED;
+        }
+
+        if (status == PENDING_PAYMENT) {
+            return slot.isConfirmRequired() ? PENDING_CONFIRM : CONFIRMED;
+        }
+
+        return status;
+    }
 }

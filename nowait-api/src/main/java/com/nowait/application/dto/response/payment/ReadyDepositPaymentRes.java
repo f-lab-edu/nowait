@@ -1,9 +1,7 @@
 package com.nowait.application.dto.response.payment;
 
-public record PayDepositRes(
+public record ReadyDepositPaymentRes(
     Long paymentId,
-    String paymentStatus,
-    String paymentMethod,
     String url
 ) {
 
