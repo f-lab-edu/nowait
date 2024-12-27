@@ -6,7 +6,7 @@ import com.nowait.application.dto.response.payment.PaymentResult;
 import com.nowait.domain.model.booking.Booking;
 import com.nowait.domain.model.payment.Payment;
 import com.nowait.domain.model.payment.PaymentType;
-import com.nowait.excaption.PaymentApprovalException;
+import com.nowait.exception.PaymentApprovalException;
 import com.nowait.external.api.payment.dto.request.KakaoPayApproveReq;
 import com.nowait.external.api.payment.dto.request.KakaoPayReadyReq;
 import com.nowait.external.api.payment.dto.response.KakaoPayApproveRes;

@@ -1,4 +1,4 @@
-package com.nowait.excaption;
+package com.nowait.exception;
 
 public class PaymentApprovalException extends RuntimeException {
 
