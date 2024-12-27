@@ -60,6 +60,9 @@ public class PaymentService {
             payment.getPaymentType());
         PaymentResult result = paymentGateway.approve(loginId, payment, pgToken);
         payment.updatePaymentResult(result);
+
+        BookingSlot slot = bookingService.getBookingSlotById(booking.getBookingSlotId());
+        booking.completePayment(slot);
     }
 
     private Payment getById(Long paymentId) {

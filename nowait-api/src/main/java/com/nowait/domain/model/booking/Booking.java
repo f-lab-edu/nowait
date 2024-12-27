@@ -69,6 +69,9 @@ public class Booking extends BaseTimeEntity {
         return status == BookingStatus.PENDING_PAYMENT;
     }
 
+    public void completePayment(BookingSlot slot) {
+        status = BookingStatus.next(status, slot);
+    }
 
     private static void validateUserId(Long userId) {
         requireNonNull(userId, "예약자 식별자는 필수값입니다.");
