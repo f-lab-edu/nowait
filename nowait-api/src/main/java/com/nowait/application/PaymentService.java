@@ -59,7 +59,7 @@ public class PaymentService {
         PaymentGateway paymentGateway = paymentGatewayFactory.createPaymentGateway(
             payment.getPaymentType());
         PaymentResult result = paymentGateway.approve(loginId, payment, pgToken);
-        payment.updatePaymentResult(result);
+        payment.confirm(result);
 
         BookingSlot slot = bookingService.getBookingSlotById(booking.getBookingSlotId());
         booking.completePayment(slot);

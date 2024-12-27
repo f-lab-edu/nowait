@@ -68,10 +68,11 @@ public class Payment extends BaseTimeEntity {
             amount,
             readyAt,
             null,
-            null);
+            null
+        );
     }
 
-    public void updatePaymentResult(PaymentResult result) {
+    public void confirm(PaymentResult result) {
         requireNonNull(result, "결제 결과는 필수값입니다.");
         requireNonNull(result.approvedAt(), "결제 승인 시각은 필수값입니다.");
         validateAmount(result.totalAmount());
