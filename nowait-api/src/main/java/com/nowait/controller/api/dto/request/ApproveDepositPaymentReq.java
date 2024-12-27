@@ -5,7 +5,7 @@ import jakarta.validation.constraints.NotNull;
 
 public record ApproveDepositPaymentReq(
     @NotNull
-    Long bookingId,
+    Long paymentId,
     @NotBlank
     String pgToken
 ) {
