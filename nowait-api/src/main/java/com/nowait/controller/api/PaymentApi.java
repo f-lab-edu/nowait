@@ -10,7 +10,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -30,7 +29,8 @@ public class PaymentApi {
     ) {
         // TODO: 예약금 결제 비즈니스 로직 호출
 
-        return ApiResult.ok(null);
+        return ApiResult.ok(new ReadyDepositPaymentRes(1L,
+            "https://online-payment.kakaopay.com/mockup/bridge/pc/pg/one-time/payment/1"));
     }
 
     /**
