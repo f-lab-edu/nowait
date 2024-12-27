@@ -25,7 +25,7 @@ public class PaymentApi {
      * @return 예약금 결제 준비 응답 (결제 식별자, 간편결제 redirect url)
      */
     @PostMapping("/deposit/ready")
-    public ApiResult<ReadyDepositPaymentRes> getDepositPaymentUrl(
+    public ApiResult<ReadyDepositPaymentRes> readyDepositPayment(
         @RequestBody @Valid ReadyDepositPaymentReq request
     ) {
         // TODO: 예약금 결제 비즈니스 로직 호출
@@ -40,8 +40,7 @@ public class PaymentApi {
      * @return 예약금 결제 url
      */
     @PostMapping("/deposit/approve")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public ApiResult<Void> approveDepositPaymentUrl(
+    public ApiResult<Void> approveDepositPayment(
         @RequestBody @Valid ApproveDepositPaymentReq request
     ) {
         // TODO: 예약금 결제 승인 로직 호출
