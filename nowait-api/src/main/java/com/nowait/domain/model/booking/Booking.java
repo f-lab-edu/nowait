@@ -65,6 +65,11 @@ public class Booking extends BaseTimeEntity {
         }
     }
 
+    public boolean isPaymentAvailable() {
+        return status == BookingStatus.PENDING_PAYMENT;
+    }
+
+
     private static void validateUserId(Long userId) {
         requireNonNull(userId, "예약자 식별자는 필수값입니다.");
     }
