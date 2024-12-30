@@ -7,7 +7,9 @@ public record ApproveDepositPaymentReq(
     @NotNull
     Long paymentId,
     @NotBlank
-    String pgToken
+    String pgToken,
+    @NotBlank
+    String payToken
 ) {
 
 }

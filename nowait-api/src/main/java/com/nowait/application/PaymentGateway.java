@@ -9,8 +9,8 @@ import com.nowait.domain.model.payment.PaymentType;
 public interface PaymentGateway {
 
     boolean supports(PaymentType paymentType);
-    
-    PaymentInfo prepare(Long userId, Booking booking, int amount);
+
+    PaymentInfo prepare(Long userId, Booking booking, int amount, String payToken);
 
     PaymentResult approve(Long userId, Payment payment, String pgToken);
 }

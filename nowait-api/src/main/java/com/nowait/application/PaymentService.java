@@ -10,7 +10,9 @@ import com.nowait.domain.model.payment.Payment;
 import com.nowait.domain.model.payment.PaymentType;
 import com.nowait.domain.repository.PaymentRepository;
 import com.nowait.exception.PaymentApprovalException;
+import jakarta.persistence.EntityNotFoundException;
 import java.time.LocalDateTime;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -43,18 +45,19 @@ public class PaymentService {
 
         // 3. 결제 준비
         PaymentGateway paymentGateway = paymentGatewayFactory.createPaymentGateway(paymentType);
-        PaymentInfo paymentInfo = paymentGateway.prepare(loginId, booking, amount);
-        Payment payment = paymentRepository.save(
-            Payment.of(booking.getId(), paymentInfo.tid(), paymentType, amount,
+        String payToken = UUID.randomUUID().toString();
+        PaymentInfo paymentInfo = paymentGateway.prepare(loginId, booking, amount, payToken);
+        paymentRepository.save(
+            Payment.of(payToken, booking.getId(), paymentInfo.tid(), paymentType, amount,
                 paymentInfo.createdAt()));
 
-        return new ReadyDepositPaymentRes(payment.getId(), paymentInfo.redirectPcUrl());
+        return new ReadyDepositPaymentRes(paymentInfo.redirectPcUrl());
     }
 
     @Transactional
-    public void approve(Long loginId, Long paymentId, String pgToken, LocalDateTime requestTime) {
+    public void approve(Long loginId, String payToken, String pgToken, LocalDateTime requestTime) {
         // 1. 필요한 엔티티 조회
-        Payment payment = getById(paymentId);
+        Payment payment = getByPayToken(payToken);
         Booking booking = bookingService.getById(payment.getBookingId());
 
         // 2. 검증
@@ -72,9 +75,9 @@ public class PaymentService {
         booking.completePayment(slot);
     }
 
-    private Payment getById(Long paymentId) {
-        return paymentRepository.findById(paymentId)
-            .orElseThrow(() -> new IllegalArgumentException("결제 정보가 존재하지 않습니다."));
+    private Payment getByPayToken(String payToken) {
+        return paymentRepository.findByToken(payToken)
+            .orElseThrow(() -> new EntityNotFoundException("결제 정보가 존재하지 않습니다."));
     }
 
     private void validateDepositAmount(int amount, Booking booking, DepositPolicy depositPolicy) {

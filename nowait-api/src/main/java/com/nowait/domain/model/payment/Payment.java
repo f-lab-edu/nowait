@@ -38,6 +38,9 @@ public class Payment extends BaseTimeEntity {
     @Column(name = "tid", nullable = false)
     private String tid;
 
+    @Column(name = "token", nullable = false, unique = true)
+    private String token;
+
     @Enumerated(value = EnumType.STRING)
     @Column(name = "type", nullable = false, columnDefinition = "varchar(30)")
     private PaymentType paymentType;
@@ -54,8 +57,9 @@ public class Payment extends BaseTimeEntity {
     @Column(name = "canceled_at")
     private LocalDateTime canceledAt;
 
-    public static Payment of(Long bookingId, String tid, PaymentType paymentType,
+    public static Payment of(String payToken, Long bookingId, String tid, PaymentType paymentType,
         int amount, LocalDateTime readyAt) {
+        requireNonNull(payToken, "결제 토큰은 필수값입니다.");
         validateBookingId(bookingId);
         validateTid(tid);
         validatePaymentType(paymentType);
@@ -64,6 +68,7 @@ public class Payment extends BaseTimeEntity {
             null,
             bookingId,
             tid,
+            payToken,
             paymentType,
             amount,
             readyAt,

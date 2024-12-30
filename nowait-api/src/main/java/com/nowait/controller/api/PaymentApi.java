@@ -29,7 +29,7 @@ public class PaymentApi {
     ) {
         // TODO: 예약금 결제 비즈니스 로직 호출
 
-        return ApiResult.ok(new ReadyDepositPaymentRes(1L,
+        return ApiResult.ok(new ReadyDepositPaymentRes(
             "https://online-payment.kakaopay.com/mockup/bridge/pc/pg/one-time/payment/1"));
     }
 

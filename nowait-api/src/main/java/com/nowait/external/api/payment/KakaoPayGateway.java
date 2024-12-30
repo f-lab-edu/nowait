@@ -11,6 +11,7 @@ import com.nowait.external.api.payment.dto.request.KakaoPayApproveReq;
 import com.nowait.external.api.payment.dto.request.KakaoPayReadyReq;
 import com.nowait.external.api.payment.dto.response.KakaoPayApproveRes;
 import com.nowait.external.api.payment.dto.response.KakaoPayReadyRes;
+import com.nowait.util.UrlUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
@@ -24,6 +25,7 @@ public class KakaoPayGateway implements PaymentGateway {
 
     private static final String AUTHORIZATION = "Authorization";
     private static final String TOKEN_PREFIX = "SECRET_KEY ";
+    private static final String PAY_TOKEN = "payToken";
 
     private final KakaoPayProperties properties;
 
@@ -33,13 +35,24 @@ public class KakaoPayGateway implements PaymentGateway {
     }
 
     @Override
-    public PaymentInfo prepare(Long userId, Booking booking, int amount) {
+    public PaymentInfo prepare(Long userId, Booking booking, int amount, String payToken) {
         KakaoPayReadyRes response = RestClient.create()
             .post()
             .uri(properties.readyRequestUrl())
             .header(AUTHORIZATION, TOKEN_PREFIX + properties.secretKey())
             .contentType(MediaType.APPLICATION_JSON)
-            .body(KakaoPayReadyReq.of(userId, booking, amount, properties))
+            .body(new KakaoPayReadyReq(
+                properties.cid(),
+                booking.getId().toString(),
+                userId.toString(),
+                "예약금",
+                booking.getPartySize(),
+                amount,
+                amount,
+                UrlUtils.appendQuery(properties.approvalUrl(), PAY_TOKEN, payToken),
+                UrlUtils.appendQuery(properties.cancelUrl(), PAY_TOKEN, payToken),
+                UrlUtils.appendQuery(properties.failUrl(), PAY_TOKEN, payToken)
+            ))
             .retrieve()
             .body(KakaoPayReadyRes.class);
 
