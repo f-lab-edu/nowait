@@ -2,6 +2,7 @@ package com.nowait.domain.model.booking;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
@@ -20,7 +21,6 @@ class BookingUnitTest {
 
     @Mock
     BookingSlot slot;
-
     Long userId;
     Long bookingSlotId;
     Integer partySize;
@@ -105,6 +105,28 @@ class BookingUnitTest {
             .hasMessage("인원 수는 0이상 입니다.");
 
         verifyNoInteractions(slot);
+    }
+
+    @DisplayName("사용자가 예약자인지 확인할 수 있다.")
+    @Test
+    void validateOwner() {
+        // given
+        Booking booking = Booking.of(userId, slot, partySize);
+
+        // when & then
+        assertDoesNotThrow(() -> booking.validateOwner(userId));
+    }
+
+    @DisplayName("사용자가 예약자가 아닌 경우 예외를 발생시킨다.")
+    @Test
+    void validateOwnerWithInvalidUser() {
+        // given
+        Booking booking = Booking.of(userId, slot, partySize);
+
+        // when & then
+        assertThatThrownBy(() -> booking.validateOwner(userId + 1))
+            .isInstanceOf(IllegalArgumentException.class)
+            .hasMessage("예약자가 아닙니다.");
     }
 
 
