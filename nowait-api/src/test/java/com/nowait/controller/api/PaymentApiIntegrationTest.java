@@ -69,7 +69,6 @@ class PaymentApiIntegrationTest {
 
             ReadyDepositPaymentRes data = body.data();
             assertThat(data).isNotNull();
-            assertThat(data.paymentId()).isNotNull();
             assertThat(data.url()).isNotNull();
         }
     }
@@ -82,7 +81,8 @@ class PaymentApiIntegrationTest {
         @Test
         void approveDepositPaymentWithKakaoPay() {
             // given
-            ApproveDepositPaymentReq request = new ApproveDepositPaymentReq(1L, "pgToken");
+            ApproveDepositPaymentReq request = new ApproveDepositPaymentReq(1L, "pgToken",
+                "payToken");
 
             String url = "/api/payments/deposit/approve";
             RequestEntity<ApproveDepositPaymentReq> headerAndBody = RequestEntity

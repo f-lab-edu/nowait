@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.nowait.application.dto.response.payment.PaymentResult;
 import java.time.LocalDateTime;
+import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -17,6 +18,7 @@ class PaymentUnitTest {
     PaymentType paymentType;
     int amount;
     LocalDateTime readyAt;
+    String payToken;
 
     @BeforeEach
     void setUp() {
@@ -25,6 +27,7 @@ class PaymentUnitTest {
         paymentType = PaymentType.KAKAO_PAY;
         amount = 20_000;
         readyAt = LocalDateTime.of(2024, 12, 1, 12, 0);
+        payToken = UUID.randomUUID().toString();
     }
 
     @DisplayName("결제 생성 테스트")
@@ -35,7 +38,7 @@ class PaymentUnitTest {
         @Test
         void of() {
             // when
-            Payment payment = Payment.of(bookingId, tid, paymentType, amount, readyAt);
+            Payment payment = Payment.of(payToken, bookingId, tid, paymentType, amount, readyAt);
 
             // then
             assertThat(payment.getBookingId()).isEqualTo(bookingId);
@@ -45,11 +48,20 @@ class PaymentUnitTest {
             assertThat(payment.getReadyAt()).isEqualTo(readyAt);
         }
 
+        @DisplayName("결제 토큰 없이는 결제를 생성할 수 없다.")
+        @Test
+        void ofWithoutPayToken() {
+            // when & then
+            assertThatThrownBy(() -> Payment.of(null, bookingId, tid, paymentType, amount, readyAt))
+                .isInstanceOf(NullPointerException.class)
+                .hasMessage("결제 토큰은 필수값입니다.");
+        }
+
         @DisplayName("예약 식별자 없이는 결제를 생성할 수 없다.")
         @Test
         void ofWithoutBookingId() {
             // when & then
-            assertThatThrownBy(() -> Payment.of(null, tid, paymentType, amount, readyAt))
+            assertThatThrownBy(() -> Payment.of(payToken, null, tid, paymentType, amount, readyAt))
                 .isInstanceOf(NullPointerException.class)
                 .hasMessage("예약 식별자는 필수값입니다.");
         }
@@ -58,7 +70,8 @@ class PaymentUnitTest {
         @Test
         void ofWithoutTid() {
             // when & then
-            assertThatThrownBy(() -> Payment.of(bookingId, null, paymentType, amount, readyAt))
+            assertThatThrownBy(
+                () -> Payment.of(payToken, bookingId, null, paymentType, amount, readyAt))
                 .isInstanceOf(NullPointerException.class)
                 .hasMessage("TID는 필수값입니다.");
         }
@@ -67,7 +80,7 @@ class PaymentUnitTest {
         @Test
         void ofWithoutPaymentType() {
             // when & then
-            assertThatThrownBy(() -> Payment.of(bookingId, tid, null, amount, readyAt))
+            assertThatThrownBy(() -> Payment.of(payToken, bookingId, tid, null, amount, readyAt))
                 .isInstanceOf(NullPointerException.class)
                 .hasMessage("결제 수단은 필수값입니다.");
         }
@@ -84,7 +97,7 @@ class PaymentUnitTest {
 
         @BeforeEach
         void setUp() {
-            payment = Payment.of(bookingId, tid, PaymentType.KAKAO_PAY, amount, readyAt);
+            payment = Payment.of(payToken, bookingId, tid, PaymentType.KAKAO_PAY, amount, readyAt);
             approvedAt = LocalDateTime.of(2024, 12, 1, 12, 3);
             result = new PaymentResult(readyAt, approvedAt, amount);
         }
