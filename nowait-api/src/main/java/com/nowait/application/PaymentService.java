@@ -53,17 +53,21 @@ public class PaymentService {
 
     @Transactional
     public void approve(Long loginId, Long paymentId, String pgToken, LocalDateTime requestTime) {
+        // 1. 필요한 엔티티 조회
         Payment payment = getById(paymentId);
         Booking booking = bookingService.getById(payment.getBookingId());
 
+        // 2. 검증
         booking.validateOwner(loginId);
         validateApprovalPayment(payment, booking, requestTime);
 
+        // 3. 결제 승인
         PaymentGateway paymentGateway = paymentGatewayFactory.createPaymentGateway(
             payment.getPaymentType());
         PaymentResult result = paymentGateway.approve(loginId, payment, pgToken);
         payment.confirm(result);
 
+        // 4. 예약 상태 변경
         BookingSlot slot = bookingService.getBookingSlotById(booking.getBookingSlotId());
         booking.completePayment(slot);
     }
