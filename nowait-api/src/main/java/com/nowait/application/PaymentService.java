@@ -21,7 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class PaymentService {
 
     public static final int APPROVE_WAITING_MINUTES = 10;
-    public static final int PAYMENT_WAITING_HOURS = 10;
+    public static final int PAYMENT_WAITING_HOURS = 2;
 
     private final PaymentRepository paymentRepository;
     private final PaymentGatewayFactory paymentGatewayFactory;
@@ -30,15 +30,18 @@ public class PaymentService {
     @Transactional
     public ReadyDepositPaymentRes prepare(Long loginId, Long bookingId, PaymentType paymentType,
         int amount, LocalDateTime requestTime) {
+        // 1. 필요한 엔티티 조회
         Booking booking = bookingService.getById(bookingId);
         BookingSlot slot = bookingService.getBookingSlotById(booking.getBookingSlotId());
         DepositPolicy depositPolicy = bookingService.getDepositPolicyById(
             slot.getDepositPolicyId());
 
+        // 2. 검증
         validateDepositAmount(amount, booking, depositPolicy);
         booking.validateOwner(loginId);
         validateCanBookingReady(booking, requestTime);
 
+        // 3. 결제 준비
         PaymentGateway paymentGateway = paymentGatewayFactory.createPaymentGateway(paymentType);
         PaymentInfo paymentInfo = paymentGateway.prepare(loginId, booking, amount);
         Payment payment = paymentRepository.save(
