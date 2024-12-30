@@ -70,6 +70,10 @@ public class Booking extends BaseTimeEntity {
     }
 
     public void completePayment(BookingSlot slot) {
+        if (!isPaymentAvailable()) {
+            throw new IllegalArgumentException("결제할 수 없는 예약입니다.");
+        }
+
         status = BookingStatus.next(status, slot);
     }
 
