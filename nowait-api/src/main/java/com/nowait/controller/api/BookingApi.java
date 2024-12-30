@@ -1,18 +1,18 @@
 package com.nowait.controller.api;
 
+import static java.util.Objects.isNull;
+
 import com.nowait.application.BookingService;
 import com.nowait.application.dto.response.booking.BookingRes;
 import com.nowait.application.dto.response.booking.DailyBookingStatusRes;
 import com.nowait.application.dto.response.booking.GetBookingInfoRes;
 import com.nowait.application.dto.response.booking.GetDepositInfoRes;
-import com.nowait.application.dto.response.booking.TimeSlotDto;
 import com.nowait.controller.api.dto.request.BookingReq;
 import com.nowait.controller.api.dto.response.ApiResult;
 import jakarta.validation.Valid;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -43,12 +43,10 @@ public class BookingApi {
         @RequestParam Long placeId,
         @RequestParam(required = false) LocalDate date
     ) {
-        // TODO: 예약 현황 조회 비즈니스 로직 호출
+        date = isNull(date) ? LocalDate.now() : date;
+        DailyBookingStatusRes data = bookingService.getDailyBookingStatus(placeId, date);
 
-        return ApiResult.ok(
-            new DailyBookingStatusRes(placeId, date,
-                List.of(new TimeSlotDto(LocalTime.of(18, 0), true)))
-        );
+        return ApiResult.ok(data);
     }
 
     /**
@@ -62,12 +60,12 @@ public class BookingApi {
     public ApiResult<BookingRes> book(
         @RequestBody @Valid BookingReq request
     ) {
-        // TODO: 테이블 예약 비즈니스 로직 호출
+        // TODO: Auth 기능 구현 시 loginId를 Authentication에서 가져오도록 수정
+        Long loginId = 1L;
+        BookingRes data = bookingService.book(loginId, request.placeId(), request.date(),
+            request.time(), request.partySize());
 
-        return ApiResult.of(
-            HttpStatus.CREATED,
-            new BookingRes(1L, "PENDING_PAYMENT", true, true)
-        );
+        return ApiResult.of(HttpStatus.CREATED, data);
     }
 
     /**
