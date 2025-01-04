@@ -1,0 +1,4 @@
+TRUNCATE TABLE users;
+TRUNCATE TABLE place;
+TRUNCATE TABLE booking;
+TRUNCATE TABLE booking_slot;
