@@ -13,6 +13,8 @@ import jakarta.validation.Valid;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -30,6 +32,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class BookingApi {
 
     private final BookingService bookingService;
+    private final ExecutorService executorService;
 
     /**
      * 가게 예약 현황 조회 API
@@ -57,15 +60,15 @@ public class BookingApi {
      */
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public ApiResult<BookingRes> book(
+    public CompletableFuture<ApiResult<BookingRes>> book(
         @RequestBody @Valid BookingReq request
     ) {
         // TODO: Auth 기능 구현 시 loginId를 Authentication에서 가져오도록 수정
         Long loginId = 1L;
-        BookingRes data = bookingService.book(loginId, request.placeId(), request.date(),
-            request.time(), request.partySize());
-
-        return ApiResult.of(HttpStatus.CREATED, data);
+        return CompletableFuture.supplyAsync(
+                () -> bookingService.book(loginId, request.placeId(), request.date(),
+                    request.time(), request.partySize()), executorService)
+            .thenApply((data) -> ApiResult.of(HttpStatus.CREATED, data));
     }
 
     /**
