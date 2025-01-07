@@ -1,12 +1,10 @@
 package com.nowait.application;
 
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.nowait.domain.repository.PlaceRepository;
-import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -38,28 +36,31 @@ class PlaceServiceUnitTest {
             errorMessage = "장소가 존재하지 않습니다.";
         }
 
-        @DisplayName("플레이스가 존재하는 경우, 검증에 성공한다.")
+        @DisplayName("플레이스가 존재하는 경우, true를 반환한다.")
         @Test
-        void validatePlaceExist() {
+        void existsById() {
             // given
             when(placeRepository.existsById(placeId)).thenReturn(true);
 
-            // when & then
-            assertDoesNotThrow(() -> placeService.validatePlaceExist(placeId, errorMessage));
+            // when
+            boolean exist = placeService.existsById(placeId);
+
+            // then
+            assertThat(exist).isTrue();
             verify(placeRepository).existsById(placeId);
         }
 
-        @DisplayName("플레이스가 존재하지 않는 경우, 입력받은 예외 메시지를 포함한 예외가 발생한다.")
+        @DisplayName("플레이스가 존재하지 않는 경우, false를 반환한다.")
         @Test
-        void validatePlaceNotExist() {
+        void existsByIdWhenPlaceNotExist() {
             // given
             when(placeRepository.existsById(placeId)).thenReturn(false);
 
-            // when & then
-            assertThatThrownBy(() -> placeService.validatePlaceExist(placeId, errorMessage))
-                .isInstanceOf(EntityNotFoundException.class)
-                .hasMessage(errorMessage);
+            // when
+            boolean exist = placeService.existsById(placeId);
 
+            // then
+            assertThat(exist).isFalse();
             verify(placeRepository).existsById(placeId);
         }
     }

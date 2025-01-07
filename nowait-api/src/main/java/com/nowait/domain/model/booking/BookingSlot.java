@@ -50,9 +50,12 @@ public class BookingSlot extends BaseTimeEntity {
     @Column(name = "deposit_policy_id")
     private Long depositPolicyId;
 
-    public void book() {
-        validateBookingPossible();
-        isBooked = true;
+    public void setBooked(boolean isBooked) {
+        if (isBooked) {
+            validateBookingPossible();
+        }
+
+        this.isBooked = isBooked;
     }
 
     private void validateBookingPossible() {

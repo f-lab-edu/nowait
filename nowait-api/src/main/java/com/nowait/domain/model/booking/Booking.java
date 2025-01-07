@@ -25,6 +25,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Booking extends BaseTimeEntity {
 
+    public static final int DEFAULT_PARTY_SIZE = 1;
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
@@ -48,14 +50,14 @@ public class Booking extends BaseTimeEntity {
         validateBookingSlot(slot);
         validatePartySize(partySize);
 
-        slot.book();
+        slot.setBooked(true);
 
         return new Booking(
             null,
             slot.getId(),
             userId,
             BookingStatus.getStatusAfterBooking(slot),
-            isNull(partySize) ? 1 : partySize
+            isNull(partySize) ? DEFAULT_PARTY_SIZE : partySize
         );
     }
 

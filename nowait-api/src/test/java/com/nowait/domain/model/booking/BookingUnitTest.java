@@ -55,7 +55,7 @@ class BookingUnitTest {
                 assertThat(booking.getStatus()).isEqualTo(BookingStatus.CONFIRMED);
                 assertThat(booking.getPartySize()).isEqualTo(partySize);
 
-                verify(slot).book();
+                verify(slot).setBooked(true);
                 mockedStatic.verify(() -> BookingStatus.getStatusAfterBooking(slot));
             }
         }
@@ -85,7 +85,6 @@ class BookingUnitTest {
         @DisplayName("예약 인원 정보가 없으면 1명으로 예약을 생성한다.")
         @Test
         void makeBookWithoutPartySize() {
-
             try (MockedStatic<BookingStatus> mockedStatic = mockStatic(BookingStatus.class)) {
                 // given
                 when(slot.getId()).thenReturn(bookingSlotId);
@@ -97,7 +96,9 @@ class BookingUnitTest {
 
                 // then
                 assertThat(booking.getPartySize()).isEqualTo(1);
-                verify(slot).book();
+
+                verify(slot).setBooked(true);
+                mockedStatic.verify(() -> BookingStatus.getStatusAfterBooking(slot));
             }
         }
 
@@ -141,7 +142,7 @@ class BookingUnitTest {
     }
 
     @Nested
-    @DisplayName("예약 가능 확인 테스트")
+    @DisplayName("결제 가능 확인 테스트")
     class CheckPaymentAvailableTest {
 
         @DisplayName("결제 가능한 예약인지 확인할 수 있다.")
