@@ -42,14 +42,14 @@ public class BookingApi {
      * @return 해당 날짜의 시간별 예약 현황
      */
     @GetMapping
-    public ApiResult<DailyBookingStatusRes> getDailyBookingStatus(
+    public CompletableFuture<ApiResult<DailyBookingStatusRes>> getDailyBookingStatus(
         @RequestParam Long placeId,
         @RequestParam(required = false) LocalDate date
     ) {
-        date = isNull(date) ? LocalDate.now() : date;
-        DailyBookingStatusRes data = bookingService.getDailyBookingStatus(placeId, date);
-
-        return ApiResult.ok(data);
+        LocalDate targetDate = isNull(date) ? LocalDate.now() : date;
+        return CompletableFuture.supplyAsync(
+                () -> bookingService.getDailyBookingStatus(placeId, targetDate), executorService)
+            .thenApply(ApiResult::ok);
     }
 
     /**
