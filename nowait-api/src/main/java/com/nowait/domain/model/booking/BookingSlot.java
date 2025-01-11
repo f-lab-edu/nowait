@@ -35,8 +35,8 @@ public class BookingSlot extends BaseTimeEntity {
     @Column(name = "time", nullable = false)
     private LocalTime time;
 
-    @Column(name = "count", nullable = false)
-    private int count;
+    @Column(name = "capacity", nullable = false)
+    private int capacity;
 
     @Column(name = "deposit_required")
     private boolean depositRequired;

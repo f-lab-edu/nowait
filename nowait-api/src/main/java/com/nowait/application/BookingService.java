@@ -63,7 +63,7 @@ public class BookingService {
             .filter(this::isActiveBooking)
             .count();
 
-        return activeCount >= slot.getCount();
+        return activeCount >= slot.getCapacity();
     }
 
     private boolean isActiveBooking(Booking booking) {

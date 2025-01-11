@@ -81,14 +81,14 @@ class BookingServiceUnitTest {
             when(slotAt18.getTime()).thenReturn(LocalTime.of(18, 0));
             when(slotAt18.getId()).thenReturn(1L);
             when(bookingRepository.findAllByBookingSlotId(slotAt18.getId())).thenReturn(List.of());
-            when(slotAt18.getCount()).thenReturn(1);
+            when(slotAt18.getCapacity()).thenReturn(1);
 
             when(slotAt19.getTime()).thenReturn(LocalTime.of(19, 0));
             when(slotAt19.getId()).thenReturn(2L);
             when(bookingRepository.findAllByBookingSlotId(slotAt19.getId())).thenReturn(
                 List.of(bookingAt19));
             when(bookingAt19.getStatus()).thenReturn(BookingStatus.CONFIRMED);
-            when(slotAt19.getCount()).thenReturn(1);
+            when(slotAt19.getCapacity()).thenReturn(1);
 
             // when
             DailyBookingStatusRes response = bookingService.getDailyBookingStatus(placeId, date);
@@ -116,7 +116,7 @@ class BookingServiceUnitTest {
             when(slotAt18.getId()).thenReturn(1L);
             when(bookingRepository.findAllByBookingSlotId(slotAt18.getId()))
                 .thenReturn(List.of(bookingAt18));
-            when(slotAt18.getCount()).thenReturn(2);
+            when(slotAt18.getCapacity()).thenReturn(2);
 
             // when
             DailyBookingStatusRes response = bookingService.getDailyBookingStatus(placeId, date);
@@ -161,7 +161,7 @@ class BookingServiceUnitTest {
             when(userService.existsById(loginId)).thenReturn(true);
             when(slot.getId()).thenReturn(1L);
             when(bookingRepository.findAllByBookingSlotId(slot.getId())).thenReturn(List.of());
-            when(slot.getCount()).thenReturn(1);
+            when(slot.getCapacity()).thenReturn(1);
             when(bookingRepository.save(any(Booking.class))).thenReturn(booking);
             when(slot.getPlaceId()).thenReturn(placeId);
 
@@ -184,7 +184,7 @@ class BookingServiceUnitTest {
             when(bookingRepository.findAllByBookingSlotId(slot.getId())).thenReturn(
                 List.of(booking));
             when(booking.getStatus()).thenReturn(BookingStatus.CONFIRMED);
-            when(slot.getCount()).thenReturn(1);
+            when(slot.getCapacity()).thenReturn(1);
 
             // when & then
             assertThatThrownBy(() -> bookingService.book(loginId, slot, partySize))

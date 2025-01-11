@@ -81,7 +81,7 @@ public class LockBookingFacadeIntegrationTest {
         when(bookingSlotRepository.findByPlaceIdAndDateAndTime(placeId, date, time))
             .thenReturn(Optional.of(slot));
         when(slot.getId()).thenReturn(1L);
-        when(slot.getCount()).thenReturn(1);
+        when(slot.getCapacity()).thenReturn(1);
         when(slot.isDepositRequired()).thenReturn(true);
 
         int threadCount = 10;
@@ -104,6 +104,6 @@ public class LockBookingFacadeIntegrationTest {
 
         // when & then
         List<Booking> bookings = bookingRepository.findAll();
-        assertThat(bookings).hasSize(slot.getCount());
+        assertThat(bookings).hasSize(slot.getCapacity());
     }
 }

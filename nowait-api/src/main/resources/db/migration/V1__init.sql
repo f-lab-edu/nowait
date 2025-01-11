@@ -28,7 +28,7 @@ CREATE TABLE booking_slot
     place_id          BIGINT    NOT NULL,
     date              DATE      NOT NULL,
     time              TIME      NOT NULL,
-    count             INT       NOT NULL,
+    capacity          INT       NOT NULL,
     deposit_required  BOOLEAN   NOT NULL,
     confirm_required  BOOLEAN   NOT NULL,
     deposit_policy_id BIGINT,
