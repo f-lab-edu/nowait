@@ -5,6 +5,11 @@ spring:
     username: user
     password: password
 
+  data:
+    redis:
+      host: localhost
+      port: 6380
+
   jpa:
     show-sql: true
     hibernate:
