@@ -6,13 +6,13 @@ import com.nowait.application.dto.response.booking.TimeSlotDto;
 import com.nowait.application.event.BookingEventPublisher;
 import com.nowait.domain.model.booking.Booking;
 import com.nowait.domain.model.booking.BookingSlot;
+import com.nowait.domain.model.booking.BookingStatus;
 import com.nowait.domain.repository.BookingRepository;
 import com.nowait.domain.repository.BookingSlotRepository;
 import jakarta.persistence.EntityNotFoundException;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,9 +33,7 @@ public class BookingService {
             placeId, date);
 
         List<TimeSlotDto> timeSlots = bookingSlots.stream()
-            .collect(Collectors.groupingBy(BookingSlot::getTime))
-            .entrySet().stream()
-            .map(entry -> new TimeSlotDto(entry.getKey(), isAvailable(entry.getValue())))
+            .map(slot -> new TimeSlotDto(slot.getTime(), !isAllBooked(slot)))
             .toList();
 
         return new DailyBookingStatusRes(placeId, date, timeSlots);
@@ -47,7 +45,9 @@ public class BookingService {
         validateUserExist(loginId, "존재하지 않는 사용자의 요청입니다.");
         validatePlaceExist(placeId, "존재하지 않는 식당입니다.");
 
-        BookingSlot slot = findAvailableSlot(placeId, date, time);
+        BookingSlot slot = bookingSlotRepository.findByPlaceIdAndDateAndTime(placeId, date, time)
+            .orElseThrow(() -> new IllegalArgumentException("해당 시간대의 예약이 불가능합니다."));
+        validateBookingPossible(slot);
         Booking booking = bookingRepository.save(Booking.of(loginId, slot, partySize));
 
         bookingEventPublisher.publishBookedEvent(booking, placeId);
@@ -55,14 +55,25 @@ public class BookingService {
         return BookingRes.of(booking, slot);
     }
 
-    private boolean isAvailable(List<BookingSlot> slots) {
-        // 모든 슬롯이 예약된 경우에만 false 반환
-        return slots.stream().anyMatch(slot -> !slot.isBooked());
+    private boolean isAllBooked(BookingSlot slot) {
+        List<Booking> bookings = bookingRepository.findAllByBookingSlotId(slot.getId());
+
+        long activeCount = bookings.stream()
+            .filter(this::isActiveBooking)
+            .count();
+
+        return activeCount >= slot.getCount();
     }
 
-    private BookingSlot findAvailableSlot(Long placeId, LocalDate date, LocalTime time) {
-        return bookingSlotRepository.findFirstByPlaceIdAndDateAndTimeAndIsBookedFalse(placeId, date,
-            time).orElseThrow(() -> new IllegalArgumentException("예약 가능한 테이블이 없습니다."));
+    private boolean isActiveBooking(Booking booking) {
+        // TODO: 결제 대기 중이라면 결제 서비스에게 유효한 결제 상태인지 확인하는 로직 추가
+        return booking.getStatus() != BookingStatus.CANCELLED;
+    }
+
+    private void validateBookingPossible(BookingSlot slot) {
+        if (isAllBooked(slot)) {
+            throw new IllegalArgumentException("예약 가능한 테이블이 없습니다.");
+        }
     }
 
     private void validateUserExist(Long userId, String errorMessage) {
