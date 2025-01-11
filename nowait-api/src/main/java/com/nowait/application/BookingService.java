@@ -1,6 +1,5 @@
 package com.nowait.application;
 
-import com.nowait.application.dto.response.booking.BookingRes;
 import com.nowait.application.dto.response.booking.DailyBookingStatusRes;
 import com.nowait.application.dto.response.booking.TimeSlotDto;
 import com.nowait.application.event.BookingEventPublisher;
@@ -40,19 +39,21 @@ public class BookingService {
     }
 
     @Transactional
-    public BookingRes book(Long loginId, Long placeId, LocalDate date, LocalTime time,
-        Integer partySize) {
+    public Booking book(Long loginId, BookingSlot slot, Integer partySize) {
         validateUserExist(loginId, "존재하지 않는 사용자의 요청입니다.");
-        validatePlaceExist(placeId, "존재하지 않는 식당입니다.");
 
-        BookingSlot slot = bookingSlotRepository.findByPlaceIdAndDateAndTime(placeId, date, time)
-            .orElseThrow(() -> new IllegalArgumentException("해당 시간대의 예약이 불가능합니다."));
         validateBookingPossible(slot);
         Booking booking = bookingRepository.save(Booking.of(loginId, slot, partySize));
 
-        bookingEventPublisher.publishBookedEvent(booking, placeId);
+        bookingEventPublisher.publishBookedEvent(booking, slot.getPlaceId());
 
-        return BookingRes.of(booking, slot);
+        return booking;
+    }
+
+    public BookingSlot getSlotBy(Long placeId, LocalDate date, LocalTime time) {
+        validatePlaceExist(placeId, "존재하지 않는 식당입니다.");
+        return bookingSlotRepository.findByPlaceIdAndDateAndTime(placeId, date, time)
+            .orElseThrow(() -> new IllegalArgumentException("해당 시간대의 예약 슬롯이 존재하지 않습니다."));
     }
 
     private boolean isAllBooked(BookingSlot slot) {
