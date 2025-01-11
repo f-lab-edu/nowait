@@ -159,55 +159,27 @@ class BookingServiceUnitTest {
         void book() {
             // given
             when(userService.existsById(loginId)).thenReturn(true);
-            when(placeService.existsById(placeId)).thenReturn(true);
-            when(bookingSlotRepository.findByPlaceIdAndDateAndTime(placeId, date, time))
-                .thenReturn(Optional.of(slot));
             when(slot.getId()).thenReturn(1L);
             when(bookingRepository.findAllByBookingSlotId(slot.getId())).thenReturn(List.of());
             when(slot.getCount()).thenReturn(1);
             when(bookingRepository.save(any(Booking.class))).thenReturn(booking);
-            when(booking.getStatus()).thenReturn(BookingStatus.CONFIRMED);
+            when(slot.getPlaceId()).thenReturn(placeId);
 
             // when
-            bookingService.book(loginId, placeId, date, time, partySize);
+            bookingService.book(loginId, slot, partySize);
 
             // then
             verify(userService).existsById(loginId);
-            verify(placeService).existsById(placeId);
-            verify(bookingSlotRepository).findByPlaceIdAndDateAndTime(placeId, date, time);
             verify(bookingRepository).findAllByBookingSlotId(slot.getId());
             verify(bookingRepository).save(any(Booking.class));
             verify(bookingEventPublisher).publishBookedEvent(booking, placeId);
         }
 
-        @DisplayName("해당 시간대의 예약 슬롯이 없는 경우에는 예약을 할 수 없다")
-        @Test
-        void bookGhostSlot() {
-            // given
-            when(userService.existsById(loginId)).thenReturn(true);
-            when(placeService.existsById(placeId)).thenReturn(true);
-            when(bookingSlotRepository.findByPlaceIdAndDateAndTime(placeId, date, time))
-                .thenReturn(Optional.empty());
-
-            // when & then
-            assertThatThrownBy(() -> bookingService.book(loginId, placeId, date, time, partySize))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("해당 시간대의 예약이 불가능합니다.");
-
-            verify(userService).existsById(loginId);
-            verify(placeService).existsById(placeId);
-            verify(bookingSlotRepository).findByPlaceIdAndDateAndTime(placeId, date, time);
-            verifyNoInteractions(bookingEventPublisher);
-        }
-
-        @DisplayName("해당 시간대의 예약 슬롯이 없는 경우에는 예약을 할 수 없다")
+        @DisplayName("해당 시간대에 이미 예약이 다 찬 경우 예약을 할 수 없다")
         @Test
         void alreadyFullyBooked() {
             // given
             when(userService.existsById(loginId)).thenReturn(true);
-            when(placeService.existsById(placeId)).thenReturn(true);
-            when(bookingSlotRepository.findByPlaceIdAndDateAndTime(placeId, date, time))
-                .thenReturn(Optional.of(slot));
             when(slot.getId()).thenReturn(1L);
             when(bookingRepository.findAllByBookingSlotId(slot.getId())).thenReturn(
                 List.of(booking));
@@ -215,13 +187,11 @@ class BookingServiceUnitTest {
             when(slot.getCount()).thenReturn(1);
 
             // when & then
-            assertThatThrownBy(() -> bookingService.book(loginId, placeId, date, time, partySize))
+            assertThatThrownBy(() -> bookingService.book(loginId, slot, partySize))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("예약 가능한 테이블이 없습니다.");
 
             verify(userService).existsById(loginId);
-            verify(placeService).existsById(placeId);
-            verify(bookingSlotRepository).findByPlaceIdAndDateAndTime(placeId, date, time);
             verify(bookingRepository).findAllByBookingSlotId(slot.getId());
             verifyNoInteractions(bookingEventPublisher);
         }
@@ -233,30 +203,84 @@ class BookingServiceUnitTest {
             when(userService.existsById(loginId)).thenReturn(false);
 
             // when & then
-            assertThatThrownBy(() -> bookingService.book(loginId, placeId, date, time, partySize))
+            assertThatThrownBy(() -> bookingService.book(loginId, slot, partySize))
                 .isInstanceOf(EntityNotFoundException.class)
                 .hasMessage("존재하지 않는 사용자의 요청입니다.");
 
             verify(userService).existsById(loginId);
-            verifyNoInteractions(placeService, bookingSlotRepository, bookingRepository,
-                bookingEventPublisher);
+            verifyNoInteractions(bookingSlotRepository, bookingRepository, bookingEventPublisher);
+        }
+    }
+
+    @Nested
+    @DisplayName("예약 슬롯 조회 테스트")
+    class GetSlotBy {
+
+        @Mock
+        BookingSlot slot;
+        Long loginId;
+        Long placeId;
+        LocalDate date;
+        LocalTime time;
+        int partySize;
+
+        @BeforeEach
+        void setUp() {
+            loginId = 1L;
+            placeId = 1L;
+            date = LocalDate.of(2024, 12, 25);
+            time = LocalTime.of(18, 0);
+            partySize = 2;
         }
 
-        @DisplayName("존재하지 않는 식당에는 예약을 할 수 없다.")
+        @DisplayName("식당 식별자, 날짜, 시간으로 예약 슬롯을 조회할 수 있다.")
         @Test
-        void bookWithNonExistPlace() {
+        void getSlotBy() {
             // given
-            when(userService.existsById(loginId)).thenReturn(true);
+            when(placeService.existsById(placeId)).thenReturn(true);
+            when(bookingSlotRepository.findByPlaceIdAndDateAndTime(placeId, date, time))
+                .thenReturn(Optional.of(slot));
+
+            // when
+            BookingSlot result = bookingService.getSlotBy(placeId, date, time);
+
+            // then
+            assertThat(result).isEqualTo(slot);
+
+            verify(placeService).existsById(placeId);
+            verify(bookingSlotRepository).findByPlaceIdAndDateAndTime(placeId, date, time);
+        }
+
+        @DisplayName("존재하지 않는 식당 식별자로 예약 슬롯을 조회할 수 없다.")
+        @Test
+        void getSlotByWithNonExistPlace() {
+            // given
             when(placeService.existsById(placeId)).thenReturn(false);
 
             // when & then
-            assertThatThrownBy(() -> bookingService.book(loginId, placeId, date, time, partySize))
+            assertThatThrownBy(() -> bookingService.getSlotBy(placeId, date, time))
                 .isInstanceOf(EntityNotFoundException.class)
                 .hasMessage("존재하지 않는 식당입니다.");
 
-            verify(userService).existsById(loginId);
             verify(placeService).existsById(placeId);
-            verifyNoInteractions(bookingSlotRepository, bookingRepository, bookingEventPublisher);
+            verifyNoInteractions(bookingSlotRepository);
+        }
+
+        @DisplayName("해당 시간대의 예약 슬롯이 없는 경우에는 예약 슬롯을 조회할 수 없다.")
+        @Test
+        void getNonExistSlot() {
+            // given
+            when(placeService.existsById(placeId)).thenReturn(true);
+            when(bookingSlotRepository.findByPlaceIdAndDateAndTime(placeId, date, time))
+                .thenReturn(Optional.empty());
+
+            // when & then
+            assertThatThrownBy(() -> bookingService.getSlotBy(placeId, date, time))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("해당 시간대의 예약 슬롯이 존재하지 않습니다.");
+
+            verify(placeService).existsById(placeId);
+            verify(bookingSlotRepository).findByPlaceIdAndDateAndTime(placeId, date, time);
         }
     }
 }
