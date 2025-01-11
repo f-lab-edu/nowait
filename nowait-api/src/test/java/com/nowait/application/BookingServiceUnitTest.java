@@ -3,6 +3,7 @@ package com.nowait.application;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
@@ -55,13 +56,14 @@ class BookingServiceUnitTest {
 
         long placeId;
         LocalDate date;
-
         @Mock
         BookingSlot slotAt18;
         @Mock
-        BookingSlot unavailableSlotAt18;
+        BookingSlot slotAt19;
         @Mock
-        BookingSlot unavailableSlotAt19;
+        Booking bookingAt18;
+        @Mock
+        Booking bookingAt19;
 
         @BeforeEach
         void setUp() {
@@ -73,16 +75,20 @@ class BookingServiceUnitTest {
         @Test
         void getDailyBookingStatus() {
             // given
-            List<BookingSlot> bookingSlots = List.of(slotAt18, unavailableSlotAt19);
-
-            when(bookingSlotRepository.findAllByPlaceIdAndDate(any(Long.class),
-                any(LocalDate.class))).thenReturn(bookingSlots);
+            when(bookingSlotRepository.findAllByPlaceIdAndDate(anyLong(), any(LocalDate.class)))
+                .thenReturn(List.of(slotAt18, slotAt19));
 
             when(slotAt18.getTime()).thenReturn(LocalTime.of(18, 0));
-            when(slotAt18.isBooked()).thenReturn(false);
+            when(slotAt18.getId()).thenReturn(1L);
+            when(bookingRepository.findAllByBookingSlotId(slotAt18.getId())).thenReturn(List.of());
+            when(slotAt18.getCount()).thenReturn(1);
 
-            when(unavailableSlotAt19.getTime()).thenReturn(LocalTime.of(19, 0));
-            when(unavailableSlotAt19.isBooked()).thenReturn(true);
+            when(slotAt19.getTime()).thenReturn(LocalTime.of(19, 0));
+            when(slotAt19.getId()).thenReturn(2L);
+            when(bookingRepository.findAllByBookingSlotId(slotAt19.getId())).thenReturn(
+                List.of(bookingAt19));
+            when(bookingAt19.getStatus()).thenReturn(BookingStatus.CONFIRMED);
+            when(slotAt19.getCount()).thenReturn(1);
 
             // when
             DailyBookingStatusRes response = bookingService.getDailyBookingStatus(placeId, date);
@@ -95,38 +101,33 @@ class BookingServiceUnitTest {
             assertThat(response.timeList().get(1).available()).isFalse();
 
             verify(bookingSlotRepository).findAllByPlaceIdAndDate(placeId, date);
+            verify(bookingRepository).findAllByBookingSlotId(slotAt18.getId());
+            verify(bookingRepository).findAllByBookingSlotId(slotAt19.getId());
         }
 
         @DisplayName("해당 시간의 모든 테이블이 예약된 경우에만 예약 불가능한 상태가 된다")
         @Test
         void getDailyBookingStatus2() {
             // given
-            List<BookingSlot> bookingSlots = List.of(
-                unavailableSlotAt18, slotAt18, unavailableSlotAt19, unavailableSlotAt19);
-
-            when(bookingSlotRepository.findAllByPlaceIdAndDate(any(Long.class),
-                any(LocalDate.class))).thenReturn(bookingSlots);
+            when(bookingSlotRepository.findAllByPlaceIdAndDate(anyLong(), any(LocalDate.class)))
+                .thenReturn(List.of(slotAt18));
 
             when(slotAt18.getTime()).thenReturn(LocalTime.of(18, 0));
-            when(slotAt18.isBooked()).thenReturn(false);
-
-            when(unavailableSlotAt18.getTime()).thenReturn(LocalTime.of(18, 0));
-            when(unavailableSlotAt18.isBooked()).thenReturn(true);
-
-            when(unavailableSlotAt19.getTime()).thenReturn(LocalTime.of(19, 0));
-            when(unavailableSlotAt19.isBooked()).thenReturn(true);
+            when(slotAt18.getId()).thenReturn(1L);
+            when(bookingRepository.findAllByBookingSlotId(slotAt18.getId()))
+                .thenReturn(List.of(bookingAt18));
+            when(slotAt18.getCount()).thenReturn(2);
 
             // when
             DailyBookingStatusRes response = bookingService.getDailyBookingStatus(placeId, date);
 
             // then
-            assertThat(response.timeList()).hasSize(2);
+            assertThat(response.timeList()).hasSize(1);
             assertThat(response.timeList().get(0).time()).isEqualTo(LocalTime.of(18, 0));
             assertThat(response.timeList().get(0).available()).isTrue();
-            assertThat(response.timeList().get(1).time()).isEqualTo(LocalTime.of(19, 0));
-            assertThat(response.timeList().get(1).available()).isFalse();
 
             verify(bookingSlotRepository).findAllByPlaceIdAndDate(placeId, date);
+            verify(bookingRepository).findAllByBookingSlotId(slotAt18.getId());
         }
     }
 
@@ -159,8 +160,11 @@ class BookingServiceUnitTest {
             // given
             when(userService.existsById(loginId)).thenReturn(true);
             when(placeService.existsById(placeId)).thenReturn(true);
-            when(bookingSlotRepository.findFirstByPlaceIdAndDateAndTimeAndIsBookedFalse(
-                placeId, date, time)).thenReturn(Optional.of(slot));
+            when(bookingSlotRepository.findByPlaceIdAndDateAndTime(placeId, date, time))
+                .thenReturn(Optional.of(slot));
+            when(slot.getId()).thenReturn(1L);
+            when(bookingRepository.findAllByBookingSlotId(slot.getId())).thenReturn(List.of());
+            when(slot.getCount()).thenReturn(1);
             when(bookingRepository.save(any(Booking.class))).thenReturn(booking);
             when(booking.getStatus()).thenReturn(BookingStatus.CONFIRMED);
 
@@ -170,20 +174,45 @@ class BookingServiceUnitTest {
             // then
             verify(userService).existsById(loginId);
             verify(placeService).existsById(placeId);
-            verify(bookingSlotRepository).findFirstByPlaceIdAndDateAndTimeAndIsBookedFalse(
-                placeId, date, time);
+            verify(bookingSlotRepository).findByPlaceIdAndDateAndTime(placeId, date, time);
+            verify(bookingRepository).findAllByBookingSlotId(slot.getId());
             verify(bookingRepository).save(any(Booking.class));
             verify(bookingEventPublisher).publishBookedEvent(booking, placeId);
         }
 
-        @DisplayName("해당 시간대의 모든 테이블이 이미 예약된 경우에는 예약을 할 수 없다")
+        @DisplayName("해당 시간대의 예약 슬롯이 없는 경우에는 예약을 할 수 없다")
+        @Test
+        void bookGhostSlot() {
+            // given
+            when(userService.existsById(loginId)).thenReturn(true);
+            when(placeService.existsById(placeId)).thenReturn(true);
+            when(bookingSlotRepository.findByPlaceIdAndDateAndTime(placeId, date, time))
+                .thenReturn(Optional.empty());
+
+            // when & then
+            assertThatThrownBy(() -> bookingService.book(loginId, placeId, date, time, partySize))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("해당 시간대의 예약이 불가능합니다.");
+
+            verify(userService).existsById(loginId);
+            verify(placeService).existsById(placeId);
+            verify(bookingSlotRepository).findByPlaceIdAndDateAndTime(placeId, date, time);
+            verifyNoInteractions(bookingEventPublisher);
+        }
+
+        @DisplayName("해당 시간대의 예약 슬롯이 없는 경우에는 예약을 할 수 없다")
         @Test
         void alreadyFullyBooked() {
             // given
             when(userService.existsById(loginId)).thenReturn(true);
             when(placeService.existsById(placeId)).thenReturn(true);
-            when(bookingSlotRepository.findFirstByPlaceIdAndDateAndTimeAndIsBookedFalse(
-                placeId, date, time)).thenReturn(Optional.empty());
+            when(bookingSlotRepository.findByPlaceIdAndDateAndTime(placeId, date, time))
+                .thenReturn(Optional.of(slot));
+            when(slot.getId()).thenReturn(1L);
+            when(bookingRepository.findAllByBookingSlotId(slot.getId())).thenReturn(
+                List.of(booking));
+            when(booking.getStatus()).thenReturn(BookingStatus.CONFIRMED);
+            when(slot.getCount()).thenReturn(1);
 
             // when & then
             assertThatThrownBy(() -> bookingService.book(loginId, placeId, date, time, partySize))
@@ -192,9 +221,9 @@ class BookingServiceUnitTest {
 
             verify(userService).existsById(loginId);
             verify(placeService).existsById(placeId);
-            verify(bookingSlotRepository).findFirstByPlaceIdAndDateAndTimeAndIsBookedFalse(
-                placeId, date, time);
-            verifyNoInteractions(bookingRepository, bookingEventPublisher);
+            verify(bookingSlotRepository).findByPlaceIdAndDateAndTime(placeId, date, time);
+            verify(bookingRepository).findAllByBookingSlotId(slot.getId());
+            verifyNoInteractions(bookingEventPublisher);
         }
 
         @DisplayName("서비스 가입자만 예약을 할 수 있다.")

@@ -3,7 +3,6 @@ package com.nowait.domain.model.booking;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mockStatic;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
@@ -50,7 +49,6 @@ class BookingUnitTest {
             assertThat(booking.getStatus()).isEqualTo(BookingStatus.CONFIRMED);
             assertThat(booking.getPartySize()).isEqualTo(partySize);
 
-            verify(slot).setBooked(true);
             mockedStatic.verify(() -> BookingStatus.getStatusAfterBooking(slot));
         }
     }
@@ -92,7 +90,6 @@ class BookingUnitTest {
 
             // then
             assertThat(booking.getPartySize()).isEqualTo(1);
-            verify(slot).setBooked(true);
         }
     }
 
