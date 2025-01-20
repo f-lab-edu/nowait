@@ -16,3 +16,7 @@ spring:
 
   flyway:
     enabled: true
+
+payment:
+  deposit-payment-wait-hours: 2
+  approval-wait-minutes: 10
