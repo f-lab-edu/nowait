@@ -30,7 +30,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @SqlGroup({
-    @Sql(scripts = "classpath:/sql/data.sql", executionPhase = ExecutionPhase.BEFORE_TEST_METHOD),
+    @Sql(scripts = "classpath:/sql/booking_api_test_data.sql", executionPhase = ExecutionPhase.BEFORE_TEST_METHOD),
     @Sql(scripts = "classpath:/sql/cleanup.sql", executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
 })
 class BookingApiIntegrationTest {
