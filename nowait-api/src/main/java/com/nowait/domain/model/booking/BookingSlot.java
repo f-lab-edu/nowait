@@ -29,17 +29,14 @@ public class BookingSlot extends BaseTimeEntity {
     @Column(name = "place_id", nullable = false)
     private Long placeId;
 
-    @Column(name = "table_id", nullable = false)
-    private Long tableId;
-
     @Column(name = "date", nullable = false)
     private LocalDate date;
 
     @Column(name = "time", nullable = false)
     private LocalTime time;
 
-    @Column(name = "is_booked")
-    private boolean isBooked;
+    @Column(name = "capacity", nullable = false)
+    private int capacity;
 
     @Column(name = "deposit_required")
     private boolean depositRequired;
@@ -49,18 +46,4 @@ public class BookingSlot extends BaseTimeEntity {
 
     @Column(name = "deposit_policy_id")
     private Long depositPolicyId;
-
-    public void setBooked(boolean isBooked) {
-        if (isBooked) {
-            validateBookingPossible();
-        }
-
-        this.isBooked = isBooked;
-    }
-
-    private void validateBookingPossible() {
-        if (isBooked()) {
-            throw new IllegalArgumentException("이미 예약된 슬롯입니다.");
-        }
-    }
 }

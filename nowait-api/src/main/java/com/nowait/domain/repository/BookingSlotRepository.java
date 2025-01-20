@@ -11,6 +11,5 @@ public interface BookingSlotRepository extends JpaRepository<BookingSlot, Long> 
 
     List<BookingSlot> findAllByPlaceIdAndDate(Long placeId, LocalDate date);
 
-    Optional<BookingSlot> findFirstByPlaceIdAndDateAndTimeAndIsBookedFalse(Long placeId,
-        LocalDate date, LocalTime time);
+    Optional<BookingSlot> findByPlaceIdAndDateAndTime(Long placeId, LocalDate date, LocalTime time);
 }

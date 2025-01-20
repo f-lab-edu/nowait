@@ -3,6 +3,7 @@ package com.nowait.controller.api;
 import static java.util.Objects.isNull;
 
 import com.nowait.application.BookingService;
+import com.nowait.application.LockBookingFacade;
 import com.nowait.application.dto.response.booking.BookingRes;
 import com.nowait.application.dto.response.booking.DailyBookingStatusRes;
 import com.nowait.application.dto.response.booking.GetBookingInfoRes;
@@ -32,7 +33,9 @@ import org.springframework.web.bind.annotation.RestController;
 public class BookingApi {
 
     private final BookingService bookingService;
+    private final LockBookingFacade lockBookingFacade;
     private final ExecutorService executorService;
+
 
     /**
      * 가게 예약 현황 조회 API
@@ -66,7 +69,7 @@ public class BookingApi {
         // TODO: Auth 기능 구현 시 loginId를 Authentication에서 가져오도록 수정
         Long loginId = 1L;
         return CompletableFuture.supplyAsync(
-                () -> bookingService.book(loginId, request.placeId(), request.date(),
+                () -> lockBookingFacade.book(loginId, request.placeId(), request.date(),
                     request.time(), request.partySize()), executorService)
             .thenApply((data) -> ApiResult.of(HttpStatus.CREATED, data));
     }

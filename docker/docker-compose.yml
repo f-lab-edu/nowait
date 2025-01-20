@@ -22,3 +22,13 @@ services:
       TZ: Asia/Seoul
     ports:
       - "3308:3306"
+
+  nowait-local-redis:
+    image: redis:latest
+    ports:
+      - "6379:6379"
+
+  nowait-test-redis:
+    image: redis:latest
+    ports:
+      - "6380:6379"

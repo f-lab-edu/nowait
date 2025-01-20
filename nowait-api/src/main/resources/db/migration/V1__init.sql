@@ -26,10 +26,9 @@ CREATE TABLE booking_slot
 (
     id                BIGINT PRIMARY KEY AUTO_INCREMENT,
     place_id          BIGINT    NOT NULL,
-    table_id          BIGINT    NOT NULL,
     date              DATE      NOT NULL,
     time              TIME      NOT NULL,
-    is_booked         BOOLEAN   NOT NULL,
+    capacity          INT       NOT NULL,
     deposit_required  BOOLEAN   NOT NULL,
     confirm_required  BOOLEAN   NOT NULL,
     deposit_policy_id BIGINT,
