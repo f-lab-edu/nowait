@@ -38,8 +38,9 @@ public class PaymentApi {
         Long loginId = 1L;
         return CompletableFuture.supplyAsync(
                 () -> paymentService.ready(loginId, request.bookingId(), request.amount(),
-                    LocalDateTime.now(clock)),
-                executorService)
+                    LocalDateTime.now(clock)), executorService)
+            .thenApply(ApiResult::ok);
+    }
             .thenApply(ApiResult::ok);
     }
 }
