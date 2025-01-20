@@ -5,6 +5,7 @@ import com.nowait.controller.api.dto.request.ReadyPaymentReq;
 import com.nowait.controller.api.dto.response.ApiResult;
 import com.nowait.controller.api.dto.response.PaymentTokenRes;
 import jakarta.validation.Valid;
+import java.time.LocalDateTime;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import lombok.RequiredArgsConstructor;
@@ -34,8 +35,8 @@ public class PaymentApi {
         // TODO: Auth 기능 구현 시 loginId를 Authentication에서 가져오도록 수정
         Long loginId = 1L;
         return CompletableFuture.supplyAsync(
-                () -> paymentService.ready(loginId, request.bookingId(), request.amount()),
-                executorService)
+                () -> paymentService.ready(loginId, request.bookingId(), request.amount(),
+                    LocalDateTime.now()), executorService)
             .thenApply(ApiResult::ok);
     }
 }

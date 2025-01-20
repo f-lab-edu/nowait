@@ -41,5 +41,9 @@ public class Payment extends BaseTimeEntity {
 
     @Column(name = "amount", nullable = false)
     private Integer amount;
+
+    public static Payment of(Long bookingId, Long userId, Integer amount) {
+        return new Payment(null, bookingId, userId, null, PaymentStatus.READY, amount);
+    }
 }
 

@@ -55,6 +55,16 @@ public class BookingService {
         return BookingRes.of(booking, slot);
     }
 
+    public Booking getById(Long bookingId) {
+        return bookingRepository.findById(bookingId)
+            .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 예약입니다."));
+    }
+
+    public BookingSlot getBookingSlotById(Long bookingSlotId) {
+        return bookingSlotRepository.findById(bookingSlotId)
+            .orElseThrow(() -> new EntityNotFoundException("예약 슬롯이 존재하지 않습니다."));
+    }
+
     private boolean isAvailable(List<BookingSlot> slots) {
         // 모든 슬롯이 예약된 경우에만 false 반환
         return slots.stream().anyMatch(slot -> !slot.isBooked());
