@@ -26,7 +26,7 @@ public class PaymentService {
 
     @Transactional
     public PaymentTokenRes ready(Long loginId, Long bookingId, Integer amount,
-        LocalDateTime requestTime) {
+        LocalDateTime requestAt) {
         // 1. 필요한 엔티티 조회
         Booking booking = bookingService.getById(bookingId);
 
@@ -35,7 +35,7 @@ public class PaymentService {
         // 2-2. 검증 - 결제 금액이 예약금과 일치하는지 확인
         depositService.validateDepositAmount(booking, amount);
         // 2-3. 검증 - 결제 가능한 상태인지 확인
-        validateCanBookingReady(booking, requestTime);
+        validateCanBookingReady(booking, requestAt);
 
         // 3. 결제 생성 및 저장
         Payment payment = paymentRepository.save(Payment.of(bookingId, loginId, amount));
@@ -47,12 +47,12 @@ public class PaymentService {
         return new PaymentTokenRes(token);
     }
 
-    private void validateCanBookingReady(Booking booking, LocalDateTime requestTime) {
+    private void validateCanBookingReady(Booking booking, LocalDateTime requestAt) {
         // 1. 예약 상태가 '결제 대기 중'인지 확인
         validatePayableBookingStatus(booking);
 
         // 2. 결제 대기 시간이 지나지 않았는지 확인
-        if (isPassedPaymentWaitingTime(booking, requestTime)) {
+        if (isPassedPaymentWaitingTime(booking, requestAt)) {
             throw new IllegalArgumentException("결제 대기 시간이 지났습니다.");
         }
     }
@@ -63,8 +63,8 @@ public class PaymentService {
         }
     }
 
-    private boolean isPassedPaymentWaitingTime(Booking booking, LocalDateTime requestTime) {
-        return requestTime.isAfter(
+    private boolean isPassedPaymentWaitingTime(Booking booking, LocalDateTime requestAt) {
+        return requestAt.isAfter(
             booking.getCreatedAt().plusHours(property.depositPaymentWaitHours()));
     }
 }
