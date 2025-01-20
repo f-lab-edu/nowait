@@ -47,6 +47,11 @@ public class PaymentService {
         return new PaymentTokenRes(token);
     }
 
+    public void approve(Long loginId, String paymentToken, String paymentKey, Long bookingId,
+        Long amount, LocalDateTime requestAt) {
+        // TODO: 결제 승인 로직 구현
+    }
+
     private void validateCanBookingReady(Booking booking, LocalDateTime requestAt) {
         // 1. 예약 상태가 '결제 대기 중'인지 확인
         validatePayableBookingStatus(booking);
