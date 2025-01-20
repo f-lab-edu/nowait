@@ -14,6 +14,8 @@ import jakarta.validation.Valid;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -32,6 +34,8 @@ public class BookingApi {
 
     private final BookingService bookingService;
     private final LockBookingFacade lockBookingFacade;
+    private final ExecutorService executorService;
+
 
     /**
      * 가게 예약 현황 조회 API
@@ -41,14 +45,14 @@ public class BookingApi {
      * @return 해당 날짜의 시간별 예약 현황
      */
     @GetMapping
-    public ApiResult<DailyBookingStatusRes> getDailyBookingStatus(
+    public CompletableFuture<ApiResult<DailyBookingStatusRes>> getDailyBookingStatus(
         @RequestParam Long placeId,
         @RequestParam(required = false) LocalDate date
     ) {
-        date = isNull(date) ? LocalDate.now() : date;
-        DailyBookingStatusRes data = bookingService.getDailyBookingStatus(placeId, date);
-
-        return ApiResult.ok(data);
+        LocalDate targetDate = isNull(date) ? LocalDate.now() : date;
+        return CompletableFuture.supplyAsync(
+                () -> bookingService.getDailyBookingStatus(placeId, targetDate), executorService)
+            .thenApply(ApiResult::ok);
     }
 
     /**
@@ -59,15 +63,15 @@ public class BookingApi {
      */
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public ApiResult<BookingRes> book(
+    public CompletableFuture<ApiResult<BookingRes>> book(
         @RequestBody @Valid BookingReq request
     ) {
         // TODO: Auth 기능 구현 시 loginId를 Authentication에서 가져오도록 수정
         Long loginId = 1L;
-        BookingRes data = lockBookingFacade.book(loginId, request.placeId(), request.date(),
-            request.time(), request.partySize());
-
-        return ApiResult.of(HttpStatus.CREATED, data);
+        return CompletableFuture.supplyAsync(
+                () -> lockBookingFacade.book(loginId, request.placeId(), request.date(),
+                    request.time(), request.partySize()), executorService)
+            .thenApply((data) -> ApiResult.of(HttpStatus.CREATED, data));
     }
 
     /**
