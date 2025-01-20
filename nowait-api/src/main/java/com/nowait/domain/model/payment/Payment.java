@@ -40,6 +40,6 @@ public class Payment extends BaseTimeEntity {
     private PaymentStatus status;
 
     @Column(name = "amount", nullable = false)
-    private Long amount;
+    private Integer amount;
 }
 
