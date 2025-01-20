@@ -1,10 +1,11 @@
 package com.nowait.controller.api;
 
 import com.nowait.application.PaymentService;
+import com.nowait.application.dto.response.payment.PaymentTokenRes;
 import com.nowait.controller.api.dto.request.ReadyPaymentReq;
 import com.nowait.controller.api.dto.response.ApiResult;
-import com.nowait.controller.api.dto.response.PaymentTokenRes;
 import jakarta.validation.Valid;
+import java.time.Clock;
 import java.time.LocalDateTime;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
@@ -21,6 +22,7 @@ public class PaymentApi {
 
     private final PaymentService paymentService;
     private final ExecutorService executorService;
+    private final Clock clock;
 
     /**
      * 결제 준비 요청 API
@@ -36,7 +38,8 @@ public class PaymentApi {
         Long loginId = 1L;
         return CompletableFuture.supplyAsync(
                 () -> paymentService.ready(loginId, request.bookingId(), request.amount(),
-                    LocalDateTime.now()), executorService)
+                    LocalDateTime.now(clock)),
+                executorService)
             .thenApply(ApiResult::ok);
     }
 }
