@@ -1,4 +1,4 @@
-package com.nowait.controller.api.dto.response;
+package com.nowait.application.dto.response.payment;
 
 public record PaymentTokenRes(
     String paymentToken

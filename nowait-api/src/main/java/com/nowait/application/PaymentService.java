@@ -1,7 +1,7 @@
 package com.nowait.application;
 
+import com.nowait.application.dto.response.payment.PaymentTokenRes;
 import com.nowait.config.PaymentProperties;
-import com.nowait.controller.api.dto.response.PaymentTokenRes;
 import com.nowait.domain.model.booking.Booking;
 import com.nowait.domain.model.payment.Payment;
 import com.nowait.domain.model.payment.PaymentToken;
