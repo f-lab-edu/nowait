@@ -230,4 +230,90 @@ class BookingServiceUnitTest {
             verifyNoInteractions(bookingSlotRepository, bookingRepository, bookingEventPublisher);
         }
     }
+
+
+    @Nested
+    @DisplayName("예약 조회 테스트")
+    class RetrieveBookingTest {
+
+        @Mock
+        Booking booking;
+        Long bookingId;
+
+        @BeforeEach
+        void setUp() {
+            bookingId = 1L;
+        }
+
+        @DisplayName("예약 식별자로 예약을 조회할 수 있다.")
+        @Test
+        void getById() {
+            // given
+            when(bookingRepository.findById(bookingId)).thenReturn(Optional.of(booking));
+
+            // when
+            Booking result = bookingService.getById(bookingId);
+
+            // then
+            assertThat(result).isEqualTo(booking);
+            verify(bookingRepository).findById(bookingId);
+        }
+
+        @DisplayName("존재하지 않는 예약 식별자로 조회할 경우 예외가 발생한다.")
+        @Test
+        void getByIdWithNonExistBookingId() {
+            // given
+            when(bookingRepository.findById(bookingId)).thenReturn(Optional.empty());
+
+            // when & then
+            assertThatThrownBy(() -> bookingService.getById(bookingId))
+                .isInstanceOf(EntityNotFoundException.class)
+                .hasMessage("존재하지 않는 예약입니다.");
+
+            verify(bookingRepository).findById(bookingId);
+        }
+    }
+
+    @Nested
+    @DisplayName("예약 슬롯 조회 테스트")
+    class RetrieveBookingSlotTest {
+
+        @Mock
+        BookingSlot bookingSlot;
+        Long bookingSlotId;
+
+        @BeforeEach
+        void setUp() {
+            bookingSlotId = 1L;
+        }
+
+        @DisplayName("예약 슬롯 식별자로 예약 슬롯을 조회할 수 있다.")
+        @Test
+        void getBookingSlotById() {
+            // given
+            when(bookingSlotRepository.findById(bookingSlotId)).thenReturn(
+                Optional.of(bookingSlot));
+
+            // when
+            BookingSlot result = bookingService.getBookingSlotById(bookingSlotId);
+
+            // then
+            assertThat(result).isEqualTo(bookingSlot);
+            verify(bookingSlotRepository).findById(bookingSlotId);
+        }
+
+        @DisplayName("존재하지 않는 예약 슬롯 식별자로 조회할 경우 예외가 발생한다.")
+        @Test
+        void getBookingSlotByIdWithNonExistBookingSlotId() {
+            // given
+            when(bookingSlotRepository.findById(bookingSlotId)).thenReturn(Optional.empty());
+
+            // when & then
+            assertThatThrownBy(() -> bookingService.getBookingSlotById(bookingSlotId))
+                .isInstanceOf(EntityNotFoundException.class)
+                .hasMessage("예약 슬롯이 존재하지 않습니다.");
+
+            verify(bookingSlotRepository).findById(bookingSlotId);
+        }
+    }
 }
