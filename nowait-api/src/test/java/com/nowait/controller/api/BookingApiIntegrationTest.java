@@ -7,6 +7,7 @@ import com.nowait.application.dto.response.booking.BookingRes;
 import com.nowait.application.dto.response.booking.DailyBookingStatusRes;
 import com.nowait.application.dto.response.booking.GetBookingInfoRes;
 import com.nowait.application.dto.response.booking.GetDepositInfoRes;
+import com.nowait.config.TestConfig;
 import com.nowait.controller.api.dto.request.BookingReq;
 import com.nowait.controller.api.dto.response.ApiResult;
 import java.time.LocalDate;
@@ -19,6 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.context.annotation.Import;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
@@ -30,9 +32,10 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @SqlGroup({
-    @Sql(scripts = "classpath:/sql/data.sql", executionPhase = ExecutionPhase.BEFORE_TEST_METHOD),
+    @Sql(scripts = "classpath:/sql/booking_api_test_data.sql", executionPhase = ExecutionPhase.BEFORE_TEST_METHOD),
     @Sql(scripts = "classpath:/sql/cleanup.sql", executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
 })
+@Import(TestConfig.class)
 class BookingApiIntegrationTest {
 
     @Autowired
