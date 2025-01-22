@@ -5,5 +5,6 @@ import com.nowait.controller.api.dto.response.ApiResult;
 
 public interface PaymentExecutor {
 
-    ApiResult<ApproveRes> executeApproval(Long bookingId, Integer amount, String paymentKey);
+    ApiResult<ApproveRes> executeApproval(Long bookingId, Integer amount, String paymentKey,
+        String idempotencyKey);
 }

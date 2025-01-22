@@ -2,7 +2,7 @@ package com.nowait.controller.api;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.nowait.application.dto.response.payment.PaymentTokenRes;
+import com.nowait.application.dto.response.payment.ReadyPaymentRes;
 import com.nowait.config.TestConfig;
 import com.nowait.controller.api.dto.request.ReadyPaymentReq;
 import com.nowait.controller.api.dto.response.ApiResult;
@@ -61,7 +61,7 @@ class PaymentApiIntegrationTest {
                 .body(request);
 
             // when
-            ResponseEntity<ApiResult<PaymentTokenRes>> result = template.exchange(
+            ResponseEntity<ApiResult<ReadyPaymentRes>> result = template.exchange(
                 url,
                 HttpMethod.POST,
                 headerAndBody,
@@ -72,14 +72,14 @@ class PaymentApiIntegrationTest {
             // then
             assertThat(result.getStatusCode()).isEqualTo(HttpStatus.OK);
 
-            ApiResult<PaymentTokenRes> body = result.getBody();
+            ApiResult<ReadyPaymentRes> body = result.getBody();
             assertThat(body).isNotNull();
             assertThat(body.code()).isEqualTo(200);
             assertThat(body.status()).isEqualTo(HttpStatus.OK);
 
-            PaymentTokenRes data = body.data();
+            ReadyPaymentRes data = body.data();
             assertThat(data).isNotNull();
-            assertThat(data.paymentToken()).isNotNull();
+            assertThat(data.id()).isNotNull();
         }
     }
 }

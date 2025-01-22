@@ -1,7 +1,7 @@
 package com.nowait.controller.api;
 
 import com.nowait.application.PaymentService;
-import com.nowait.application.dto.response.payment.PaymentTokenRes;
+import com.nowait.application.dto.response.payment.ReadyPaymentRes;
 import com.nowait.application.dto.response.payment.SimplePaymentRes;
 import com.nowait.controller.api.dto.request.ApprovePaymentReq;
 import com.nowait.controller.api.dto.request.ReadyPaymentReq;
@@ -34,7 +34,7 @@ public class PaymentApi {
      * @return 결제 토큰
      */
     @PostMapping("/ready")
-    public CompletableFuture<ApiResult<PaymentTokenRes>> ready(
+    public CompletableFuture<ApiResult<ReadyPaymentRes>> ready(
         @RequestBody @Valid ReadyPaymentReq request
     ) {
         // TODO: Auth 기능 구현 시 loginId를 Authentication에서 가져오도록 수정
@@ -58,7 +58,7 @@ public class PaymentApi {
         // TODO: Auth 기능 구현 시 loginId를 Authentication에서 가져오도록 수정
         Long loginId = 1L;
         return CompletableFuture.supplyAsync(
-                () -> paymentService.approve(loginId, request.paymentKey(), request.paymentToken(),
+                () -> paymentService.approve(loginId, request.paymentId(), request.paymentKey(),
                     request.bookingId(), request.amount(), LocalDateTime.now(clock)), executorService)
             .thenApply((data) -> ApiResult.of(HttpStatus.ACCEPTED, data));
     }

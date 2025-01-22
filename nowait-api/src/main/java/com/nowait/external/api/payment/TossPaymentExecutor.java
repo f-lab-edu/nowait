@@ -37,7 +37,7 @@ public class TossPaymentExecutor implements PaymentExecutor {
 
     @Override
     public ApiResult<ApproveRes> executeApproval(Long bookingId, Integer amount,
-        String paymentKey) {
+        String paymentKey, String idempotencyKey) {
         // 1. 헤더 설정
         String secretKey = properties.secretKey() + COLON;
         String encryptedSecretKey =
@@ -45,7 +45,7 @@ public class TossPaymentExecutor implements PaymentExecutor {
         Consumer<HttpHeaders> headers = header -> {
             header.setContentType(APPLICATION_JSON);
             header.set(AUTHORIZATION_HEADER, encryptedSecretKey);
-            header.set(IDEMPOTENCY_KEY_HEADER, paymentKey);
+            header.set(IDEMPOTENCY_KEY_HEADER, idempotencyKey);
         };
 
         // 2. 요청 객체 생성

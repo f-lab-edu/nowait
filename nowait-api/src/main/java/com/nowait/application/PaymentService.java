@@ -2,7 +2,7 @@ package com.nowait.application;
 
 import com.nowait.application.dto.response.payment.ApproveFailure;
 import com.nowait.application.dto.response.payment.ApproveRes;
-import com.nowait.application.dto.response.payment.PaymentTokenRes;
+import com.nowait.application.dto.response.payment.ReadyPaymentRes;
 import com.nowait.application.dto.response.payment.SimplePaymentRes;
 import com.nowait.config.PaymentProperties;
 import com.nowait.controller.api.dto.response.ApiResult;
@@ -11,10 +11,7 @@ import com.nowait.domain.model.booking.BookingSlot;
 import com.nowait.domain.model.booking.BookingStatus;
 import com.nowait.domain.model.payment.Payment;
 import com.nowait.domain.model.payment.PaymentStatus;
-import com.nowait.domain.model.payment.PaymentToken;
 import com.nowait.domain.repository.PaymentRepository;
-import com.nowait.domain.repository.PaymentTokenRepository;
-import com.nowait.utils.ShortUUIDGenerator;
 import java.time.LocalDateTime;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
@@ -34,13 +31,12 @@ public class PaymentService {
 
     private final PaymentProperties property;
     private final PaymentRepository paymentRepository;
-    private final PaymentTokenRepository paymentTokenRepository;
     private final BookingService bookingService;
     private final DepositService depositService;
     private final PaymentExecutor paymentExecutor;
 
     @Transactional
-    public PaymentTokenRes ready(Long loginId, Long bookingId, Integer amount,
+    public ReadyPaymentRes ready(Long loginId, Long bookingId, Integer amount,
         LocalDateTime requestAt) {
         // 1. 필요한 엔티티 조회
         Booking booking = bookingService.getById(bookingId);
@@ -55,20 +51,14 @@ public class PaymentService {
         // 3. 결제 생성 및 저장
         Payment payment = paymentRepository.save(Payment.of(bookingId, loginId, amount));
 
-        // 4. PaymentToken 생성 및 저장
-        String token = ShortUUIDGenerator.generate();
-        paymentTokenRepository.save(PaymentToken.of(token, payment.getId()));
-
-        return new PaymentTokenRes(token);
+        return new ReadyPaymentRes(payment.getId());
     }
 
     @Transactional
-    public SimplePaymentRes approve(Long loginId, String paymentToken, String paymentKey,
+    public SimplePaymentRes approve(Long loginId, Long paymentId, String paymentKey,
         Long bookingId, Integer amount, LocalDateTime requestAt) {
         // 1. 필요한 엔티티 조회
-        PaymentToken token = paymentTokenRepository.findById(paymentToken)
-            .orElseThrow(() -> new IllegalArgumentException("승인 대기 시간이 지났습니다."));
-        Payment payment = paymentRepository.findById(token.getPaymentId())
+        Payment payment = paymentRepository.findById(paymentId)
             .orElseThrow(() -> new IllegalArgumentException("결제 정보가 존재하지 않습니다."));
         Booking booking = bookingService.getById(payment.getBookingId());
 
@@ -86,7 +76,8 @@ public class PaymentService {
 
         // 4. 결제 승인 (비동기)
         CompletableFuture.supplyAsync(
-                () -> paymentExecutor.executeApproval(bookingId, amount, paymentKey))
+                () -> paymentExecutor.executeApproval(bookingId, amount, paymentKey,
+                    String.valueOf(paymentId)))
             .thenAccept(result -> {
                 // 4-1. 승인 성공
                 ApproveRes data = result.data();
@@ -180,9 +171,9 @@ public class PaymentService {
 
                 // 2. 재시도 실행
                 ApiResult<ApproveRes> result = paymentExecutor.executeApproval(bookingId, amount,
-                    paymentKey);
+                    paymentKey, String.valueOf(payment.getId()));
 
-                // 성공 시 상태 변경 및 종료
+                // 3. 성공 시 상태 변경 및 종료
                 if (result.status() == HttpStatus.OK) {
                     approveSuccessfully(result.data());
                     return;
@@ -195,7 +186,7 @@ public class PaymentService {
             }
         }
 
-        // 최대 재시도 후 실패 처리
+        // 4. 최대 재시도 후 실패 처리
         log.error("최대 재시도 횟수 초과: 결제 승인 재시도 실패");
     }
 }
