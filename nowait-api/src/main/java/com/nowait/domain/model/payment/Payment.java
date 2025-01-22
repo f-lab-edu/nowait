@@ -42,6 +42,12 @@ public class Payment extends BaseTimeEntity {
     @Column(name = "amount", nullable = false)
     private Integer amount;
 
+    @Column(name = "error_code")
+    private String errorCode;
+
+    @Column(name = "error_message")
+    private String errorMessage;
+
     public static Payment of(Long bookingId, Long userId, Integer amount) {
         return new Payment(null, bookingId, userId, null, PaymentStatus.READY, amount);
     }
