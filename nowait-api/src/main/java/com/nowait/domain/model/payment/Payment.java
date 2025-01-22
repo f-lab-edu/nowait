@@ -9,6 +9,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import java.util.Objects;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -49,7 +50,28 @@ public class Payment extends BaseTimeEntity {
     private String errorMessage;
 
     public static Payment of(Long bookingId, Long userId, Integer amount) {
-        return new Payment(null, bookingId, userId, null, PaymentStatus.READY, amount);
+        return new Payment(null, bookingId, userId, null, PaymentStatus.READY, amount, null, null);
+    }
+
+    public void validateDetails(String paymentKey, Long bookingId, Integer amount) {
+        if (!Objects.equals(paymentKey, this.paymentKey) || !Objects.equals(bookingId,
+            this.bookingId) || !Objects.equals(amount, this.amount)) {
+            throw new IllegalArgumentException("결제 정보가 일치하지 않습니다.");
+        }
+    }
+
+    public void changeStatusTo(PaymentStatus paymentStatus) {
+        this.status = paymentStatus;
+    }
+
+    public void fail(String code, String message) {
+        this.status = PaymentStatus.ABORTED;
+        this.errorCode = code;
+        this.errorMessage = message;
+    }
+
+    public void setPaymentKey(String paymentKey) {
+        this.paymentKey = paymentKey;
     }
 }
 
