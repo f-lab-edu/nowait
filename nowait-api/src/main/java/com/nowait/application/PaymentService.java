@@ -1,13 +1,10 @@
 package com.nowait.application;
 
-import com.nowait.application.dto.response.payment.PaymentTokenRes;
+import com.nowait.application.dto.response.payment.ReadyPaymentRes;
 import com.nowait.config.PaymentProperties;
 import com.nowait.domain.model.booking.Booking;
 import com.nowait.domain.model.payment.Payment;
-import com.nowait.domain.model.payment.PaymentToken;
 import com.nowait.domain.repository.PaymentRepository;
-import com.nowait.domain.repository.PaymentTokenRepository;
-import com.nowait.utils.ShortUUIDGenerator;
 import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -20,12 +17,11 @@ public class PaymentService {
 
     private final PaymentProperties property;
     private final PaymentRepository paymentRepository;
-    private final PaymentTokenRepository paymentTokenRepository;
     private final BookingService bookingService;
     private final DepositService depositService;
 
     @Transactional
-    public PaymentTokenRes ready(Long loginId, Long bookingId, Integer amount,
+    public ReadyPaymentRes ready(Long loginId, Long bookingId, Integer amount,
         LocalDateTime requestAt) {
         // 1. 필요한 엔티티 조회
         Booking booking = bookingService.getById(bookingId);
@@ -40,11 +36,7 @@ public class PaymentService {
         // 3. 결제 생성 및 저장
         Payment payment = paymentRepository.save(Payment.of(bookingId, loginId, amount));
 
-        // 4. PaymentToken 생성 및 저장
-        String token = ShortUUIDGenerator.generate();
-        paymentTokenRepository.save(PaymentToken.of(token, payment.getId()));
-
-        return new PaymentTokenRes(token);
+        return new ReadyPaymentRes(payment.getId());
     }
 
     private void validateCanBookingReady(Booking booking, LocalDateTime requestAt) {

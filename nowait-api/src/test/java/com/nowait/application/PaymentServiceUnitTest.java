@@ -11,10 +11,7 @@ import static org.mockito.Mockito.when;
 import com.nowait.config.PaymentProperties;
 import com.nowait.domain.model.booking.Booking;
 import com.nowait.domain.model.payment.Payment;
-import com.nowait.domain.model.payment.PaymentToken;
 import com.nowait.domain.repository.PaymentRepository;
-import com.nowait.domain.repository.PaymentTokenRepository;
-import com.nowait.utils.ShortUUIDGenerator;
 import java.time.LocalDateTime;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -35,8 +32,6 @@ class PaymentServiceUnitTest {
     @Mock
     PaymentRepository paymentRepository;
     @Mock
-    PaymentTokenRepository paymentTokenRepository;
-    @Mock
     BookingService bookingService;
     @Mock
     DepositService depositService;
@@ -49,8 +44,6 @@ class PaymentServiceUnitTest {
         Booking booking;
         @Mock
         Payment payment;
-        @Mock
-        PaymentToken paymentToken;
 
         Long loginId;
         Long bookingId;
@@ -64,7 +57,6 @@ class PaymentServiceUnitTest {
             loginId = 1L;
             bookingId = 1L;
             requestAt = LocalDateTime.of(2024, 12, 1, 14, 0);
-            token = ShortUUIDGenerator.generate();
         }
 
         @DisplayName("결제 준비 요청을 할 수 있다.")
@@ -78,7 +70,6 @@ class PaymentServiceUnitTest {
             when(booking.getCreatedAt()).thenReturn(LocalDateTime.of(2024, 12, 1, 12, 0));
             when(property.depositPaymentWaitHours()).thenReturn(2);
             when(paymentRepository.save(any(Payment.class))).thenReturn(payment);
-            when(paymentTokenRepository.save(any(PaymentToken.class))).thenReturn(paymentToken);
 
             // when
             paymentService.ready(loginId, bookingId, amount, requestAt);
@@ -91,7 +82,6 @@ class PaymentServiceUnitTest {
             verify(booking).getCreatedAt();
             verify(property).depositPaymentWaitHours();
             verify(paymentRepository).save(any(Payment.class));
-            verify(paymentTokenRepository).save(any(PaymentToken.class));
         }
 
         @DisplayName("이미 결제가 완료된 예약인 경우, 결제 준비를 할 수 없다.")
@@ -116,7 +106,6 @@ class PaymentServiceUnitTest {
             verify(booking).isPaymentAvailable();
 
             verifyNoInteractions(paymentRepository);
-            verifyNoInteractions(paymentTokenRepository);
         }
 
         @DisplayName("예약 후 2시간 이내에 결제를 시도하지 않는 경우, 예약이 취소되어 결제를 할 수 없다.")
@@ -139,7 +128,6 @@ class PaymentServiceUnitTest {
                 .hasMessage("결제 대기 시간이 지났습니다.");
 
             verifyNoInteractions(paymentRepository);
-            verifyNoInteractions(paymentTokenRepository);
         }
     }
 }
