@@ -22,5 +22,5 @@ spring:
     locations: classpath:db/migration
 
 payment:
-  deposit-payment-wait-hours: 2
+  deposit-payment-wait-minutes: 2
   approval-wait-minutes: 10

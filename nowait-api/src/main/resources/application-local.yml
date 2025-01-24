@@ -18,5 +18,8 @@ spring:
     enabled: true
 
 payment:
-  deposit-payment-wait-hours: 2
-  approval-wait-minutes: 10
+  deposit-payment-wait-minutes: 5
+  approval-wait-minutes: 5
+  toss-pay:
+    secret-key: test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6
+    confirm-url: https://api.tosspayments.com/v1/payments/confirm
