@@ -68,7 +68,7 @@ class PaymentServiceUnitTest {
             doNothing().when(depositService).validateDepositAmount(booking, amount);
             when(booking.isPaymentAvailable()).thenReturn(true);
             when(booking.getCreatedAt()).thenReturn(LocalDateTime.of(2024, 12, 1, 12, 0));
-            when(property.depositPaymentWaitHours()).thenReturn(2);
+            when(property.depositPaymentWaitMinutes()).thenReturn(2);
             when(paymentRepository.save(any(Payment.class))).thenReturn(payment);
 
             // when
@@ -80,7 +80,7 @@ class PaymentServiceUnitTest {
             verify(depositService).validateDepositAmount(booking, amount);
             verify(booking).isPaymentAvailable();
             verify(booking).getCreatedAt();
-            verify(property).depositPaymentWaitHours();
+            verify(property).depositPaymentWaitMinutes();
             verify(paymentRepository).save(any(Payment.class));
         }
 
@@ -117,7 +117,7 @@ class PaymentServiceUnitTest {
             doNothing().when(depositService).validateDepositAmount(booking, amount);
             when(booking.isPaymentAvailable()).thenReturn(true);
             when(booking.getCreatedAt()).thenReturn(LocalDateTime.of(2024, 12, 1, 12, 0));
-            when(property.depositPaymentWaitHours()).thenReturn(2);
+            when(property.depositPaymentWaitMinutes()).thenReturn(2);
 
             LocalDateTime requestTime = LocalDateTime.of(2024, 12, 1, 14, 1);
 

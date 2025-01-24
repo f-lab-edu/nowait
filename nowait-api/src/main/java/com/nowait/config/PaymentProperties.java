@@ -4,7 +4,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 
 @ConfigurationProperties("payment")
 public record PaymentProperties(
-    int depositPaymentWaitHours,
+    int depositPaymentWaitMinutes,
     int approvalWaitMinutes
 ) {
 
