@@ -79,7 +79,7 @@ public class PaymentService {
 
     public Payment getByPaymentKey(String paymentKey) {
         return paymentRepository.findByPaymentKey(paymentKey)
-            .orElseThrow(() -> new IllegalArgumentException("결제 정보가 존재하지 않습니다."));
+            .orElseThrow(() -> new EntityNotFoundException("결제 정보가 존재하지 않습니다."));
     }
 
     private void validateCanBookingReady(Booking booking, LocalDateTime requestAt) {
