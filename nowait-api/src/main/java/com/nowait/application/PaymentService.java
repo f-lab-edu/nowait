@@ -100,7 +100,7 @@ public class PaymentService {
 
     private boolean isPassedPaymentWaitingTime(Booking booking, LocalDateTime requestAt) {
         return requestAt.isAfter(
-            booking.getCreatedAt().plusHours(property.depositPaymentWaitMinutes()));
+            booking.getCreatedAt().plusMinutes(property.depositPaymentWaitMinutes()));
     }
 
     private void validateApprovalNotExpired(Payment payment, LocalDateTime requestAt) {

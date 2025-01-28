@@ -14,7 +14,7 @@ public class TestConfig {
     @Bean
     public Clock clock() {
         return Clock.fixed(
-            LocalDateTime.of(2024, 11, 1, 2, 0, 0)
+            LocalDateTime.of(2024, 11, 1, 0, 5, 0)
                 .atZone(ZoneId.systemDefault())
                 .toInstant(), ZoneId.systemDefault()
         );

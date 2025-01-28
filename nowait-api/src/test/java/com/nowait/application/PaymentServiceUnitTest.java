@@ -56,7 +56,7 @@ class PaymentServiceUnitTest {
             amount = 20_000;
             loginId = 1L;
             bookingId = 1L;
-            requestAt = LocalDateTime.of(2024, 12, 1, 14, 0);
+            requestAt = LocalDateTime.of(2024, 12, 1, 12, 5);
         }
 
         @DisplayName("결제 준비 요청을 할 수 있다.")
@@ -68,7 +68,7 @@ class PaymentServiceUnitTest {
             doNothing().when(depositService).validateDepositAmount(booking, amount);
             when(booking.isPaymentAvailable()).thenReturn(true);
             when(booking.getCreatedAt()).thenReturn(LocalDateTime.of(2024, 12, 1, 12, 0));
-            when(property.depositPaymentWaitMinutes()).thenReturn(2);
+            when(property.depositPaymentWaitMinutes()).thenReturn(5);
             when(paymentRepository.save(any(Payment.class))).thenReturn(payment);
 
             // when
