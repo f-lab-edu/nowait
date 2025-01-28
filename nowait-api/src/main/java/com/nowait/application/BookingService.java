@@ -4,8 +4,10 @@ import com.nowait.application.dto.response.booking.BookingRes;
 import com.nowait.application.dto.response.booking.DailyBookingStatusRes;
 import com.nowait.application.dto.response.booking.TimeSlotDto;
 import com.nowait.application.event.BookingEventPublisher;
+import com.nowait.application.event.PaymentSuccessEvent;
 import com.nowait.domain.model.booking.Booking;
 import com.nowait.domain.model.booking.BookingSlot;
+import com.nowait.domain.model.booking.BookingStatus;
 import com.nowait.domain.repository.BookingRepository;
 import com.nowait.domain.repository.BookingSlotRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -14,6 +16,8 @@ import java.time.LocalTime;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.kafka.support.Acknowledgment;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -63,6 +67,21 @@ public class BookingService {
     public BookingSlot getBookingSlotById(Long bookingSlotId) {
         return bookingSlotRepository.findById(bookingSlotId)
             .orElseThrow(() -> new EntityNotFoundException("예약 슬롯이 존재하지 않습니다."));
+    }
+
+    @KafkaListener(
+        topics = "payments.success",
+        groupId = "nowait"
+    )
+    @Transactional
+    public void handleSuccessPayment(PaymentSuccessEvent event, Acknowledgment acknowledgment) {
+        // 1. 결제가 완료되면 예약 상태 변경
+        Booking booking = getById(event.bookingId());
+        BookingSlot slot = getBookingSlotById(booking.getBookingSlotId());
+        booking.changeStatusTo(BookingStatus.getStatusAfterPayment(slot));
+
+        // 2. 카프카 오프셋 커밋
+        acknowledgment.acknowledge();
     }
 
     private boolean isAvailable(List<BookingSlot> slots) {
