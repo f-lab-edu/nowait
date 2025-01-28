@@ -9,6 +9,7 @@ import static org.mockito.Mockito.when;
 
 import com.nowait.application.dto.response.booking.DailyBookingStatusRes;
 import com.nowait.application.event.BookingEventPublisher;
+import com.nowait.application.event.PaymentSuccessEvent;
 import com.nowait.domain.model.booking.Booking;
 import com.nowait.domain.model.booking.BookingSlot;
 import com.nowait.domain.model.booking.BookingStatus;
@@ -16,6 +17,7 @@ import com.nowait.domain.repository.BookingRepository;
 import com.nowait.domain.repository.BookingSlotRepository;
 import jakarta.persistence.EntityNotFoundException;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
@@ -27,6 +29,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.kafka.support.Acknowledgment;
 
 @ExtendWith(MockitoExtension.class)
 class BookingServiceUnitTest {
@@ -314,6 +317,53 @@ class BookingServiceUnitTest {
                 .hasMessage("예약 슬롯이 존재하지 않습니다.");
 
             verify(bookingSlotRepository).findById(bookingSlotId);
+        }
+    }
+
+    @Nested
+    @DisplayName("결제 완료 후 예약 상태 변경 테스트")
+    class HandleSuccessPaymentTest {
+
+        @Mock
+        Acknowledgment acknowledgment;
+        @Mock
+        Booking booking;
+        @Mock
+        BookingSlot slot;
+
+        String paymentKey;
+        int amount;
+        Long bookingId;
+        LocalDateTime approvedAt;
+
+        @BeforeEach
+        void setUp() {
+            paymentKey = "paymentKey";
+            amount = 20_000;
+            bookingId = 1L;
+            approvedAt = LocalDateTime.of(2024, 12, 1, 0, 5, 0);
+        }
+
+        @DisplayName("결제 완료 이벤트가 발생하면 예약 상태를 변경한다.")
+        @Test
+        void handleSuccessPayment() {
+            // given
+            PaymentSuccessEvent event = new PaymentSuccessEvent(paymentKey, amount, bookingId,
+                approvedAt);
+            when(bookingRepository.findById(bookingId)).thenReturn(Optional.of(booking));
+            when(booking.getBookingSlotId()).thenReturn(1L);
+            when(bookingSlotRepository.findById(booking.getBookingSlotId()))
+                .thenReturn(Optional.of(slot));
+            when(slot.isConfirmRequired()).thenReturn(true);
+
+            // when
+            bookingService.handleSuccessPayment(event, acknowledgment);
+
+            // then
+            verify(bookingRepository).findById(bookingId);
+            verify(bookingSlotRepository).findById(booking.getBookingSlotId());
+            verify(booking).changeStatusTo(BookingStatus.PENDING_CONFIRM);
+            verify(acknowledgment).acknowledge();
         }
     }
 }
