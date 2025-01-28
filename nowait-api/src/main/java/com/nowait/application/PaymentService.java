@@ -8,7 +8,9 @@ import com.nowait.domain.model.booking.Booking;
 import com.nowait.domain.model.payment.Payment;
 import com.nowait.domain.model.payment.PaymentStatus;
 import com.nowait.domain.repository.PaymentRepository;
+import jakarta.persistence.EntityNotFoundException;
 import java.time.LocalDateTime;
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -56,8 +58,13 @@ public class PaymentService {
 
         // 2-1. 검증 - 예약자 본인인지 확인
         booking.validateOwner(loginId);
+
         // 2-2. 검증 - 결제 정보가 저장된 정보와 같은지 확인
-        payment.validateDetails(paymentKey, bookingId, amount);
+        if (!Objects.equals(bookingId, payment.getBookingId()) || !Objects.equals(amount,
+            payment.getAmount())) {
+            throw new IllegalArgumentException("결제 정보가 일치하지 않습니다.");
+        }
+
         // 2-3. 검증 - 예약이 결제 진행 중인지 확인
         validatePayableBookingStatus(booking);
         // 2-4. 검증 - 결제 승인 대기 시간이 지나지 않았는지 확인
