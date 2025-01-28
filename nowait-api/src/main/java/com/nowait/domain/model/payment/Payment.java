@@ -49,8 +49,12 @@ public class Payment extends BaseTimeEntity {
     @Column(name = "error_message")
     private String errorMessage;
 
+    @Column(name = "retry_count")
+    private Integer retryCount;
+
     public static Payment of(Long bookingId, Long userId, Integer amount) {
-        return new Payment(null, bookingId, userId, null, PaymentStatus.READY, amount, null, null);
+        return new Payment(null, bookingId, userId, null, PaymentStatus.READY, amount, null, null,
+            0);
     }
 
     public void validateDetails(String paymentKey, Long bookingId, Integer amount) {
@@ -72,6 +76,10 @@ public class Payment extends BaseTimeEntity {
 
     public void setPaymentKey(String paymentKey) {
         this.paymentKey = paymentKey;
+    }
+
+    public void incrementRetryCount() {
+        this.retryCount++;
     }
 }
 
